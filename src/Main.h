@@ -1,5 +1,7 @@
 #ifndef _MAIN_H
 #define _MAIN_H
+#include <stdint.h>
+
 
 
 typedef struct Data Data;
@@ -11,7 +13,7 @@ struct Data{
 };
 
 
-int Opcode(unsigned short code);
+uint32_t Opcode(uint32_t code);
 
 Data convertToOpCode(int x,unsigned short code);
 
