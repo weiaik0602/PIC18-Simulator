@@ -1,39 +1,61 @@
 #include "Main.h"
-//#include "mov.h"
+#include <stdio.h>
 #include <stdint.h>
-#include "Functions.h"
+//#include "Functions.h"
+	
+#define KB 1024
 
-volatile uint32_t *WREG = (volatile uint32_t *)0xFE8;
+#define KB 1024
+	char code[8*KB];
+	volatile char memory[32*KB];
+	volatile uint32_t *WREG=&memory[0xFE8];
 
+/*
+int simulate(uint32_t code){
+  int OPCODE=code>>8;
+  Opcode x;
+  //x=opcodeTable[OPCODE](code);
+	//int *simulator=&opcodeTable[OPCODE];
+	//*simulator(code);
+	printf("the address of WREG now is %#06x\n", &opcodeTable[OPCODE]);
+	printf("the address of WREG now is %#06x\n", PICWREG);
+	printf("the value of WREG now is %#06x\n",*PICWREG);
+	printf("the value of code now is %#06x\n",code);
+	printf("the value of opcode now is %#06x\n",OPCODE);
 
-
-
-
-
-uint32_t Opcode(uint32_t code){
-  int opcode=code>>8;
-
-  //return opcode;
-  //Data data;
-  //data=convertToOpCode(opcode,code);
-  //return WREG=0x2F;
-  //WREG=0x2F;
-  return WREG; 
-  
+	
+	
+	return OPCODE;
+	
+	
+	
+	
 }
+Opcode opcodeTable[256]={
+	//[0xaa]={addtest,0,0},
+	//[0xbb]={minustest,0,0},
+	[0x0E]={movlw},
+	
+	
+};
 
-Data convertToOpCode(int x,unsigned short code){
-  Data data;
-  switch(x){
-    case 0x000E:
-      data=movlw(code);
-    break;
-    
-    default:
-      break;
-      
-      
-  }
-  return data;
-  }
-
+  
+  */
+  
+  
+  
+  
+   /*
+	*WREG=0x00FF;
+	printf("the address of WREG now is %#06x\n", WREG);
+	printf("the value of WREG now is %#06x\n",*WREG);
+	
+	*/
+	
+	
+int movlw(uint32_t code){
+  unsigned short data;
+  data=code&0x00FF;
+  *WREG=data;
+  return 0;
+}

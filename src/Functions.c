@@ -1,10 +1,11 @@
 #include "Functions.h"
 
+/*
 
 
-
-Data movlw(unsigned short code){
-  Data data;
-  data.WREG=(code&0x00FF);
-  return data;
+void movlw(unsigned short code){
+  unsigned short data;
+  data=code&0x00FF;
+  *WREG=data;
 }
+*/
