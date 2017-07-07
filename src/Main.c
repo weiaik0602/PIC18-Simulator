@@ -49,15 +49,32 @@ Opcode opcodeTable[256]={
 	*/
 
 
-int movlw(uint32_t code){
+int movlw(uint16_t code){
   unsigned short data;
   data=code&0x00FF;
   *WREG=data;
   return 0;
 }
 
-int movwf(uint32_t code){
+int movwf(uint16_t code){
 	int a=0x01&(code>>8);
 	int address=code&0x00FF;
-	return address;
+	uint32_t *FileRegister;
+
+
+
+	if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=*WREG;
+	}
+	else{
+		*BSR=5;
+		int vBSR=*BSR;
+		vBSR=vBSR<<8;
+		address=address|vBSR;
+		FileRegister=&memory[address];
+		*FileRegister=*WREG;
+	}
+// y u so pro '^'
+	return 0;
 }

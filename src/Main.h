@@ -6,9 +6,10 @@
 
   #define KB 1024
 	char code[8*KB];
-	volatile char memory[32*KB];
-	static uint32_t *WREG=&memory[0xFE8];
-
+	uint8_t memory[32*KB];
+	static uint8_t *WREG=&memory[0xFE8];
+	static uint8_t *BSR=&memory[0xFE0];
+	//*BSR=0;
 /*
 typedef struct Opcode Opcode;
 struct Opcode{
@@ -25,8 +26,8 @@ Opcode opcodeTable[256];
 
 
 
-int movlw(uint32_t code);
-int movwf(uint32_t code);
+int movlw(uint16_t code);
+int movwf(uint16_t code);
 
 
 
