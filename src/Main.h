@@ -2,7 +2,13 @@
 #define _MAIN_H
 #include <stdint.h>
 //#include "Functions.h"
-	
+
+
+  #define KB 1024
+	char code[8*KB];
+	volatile char memory[32*KB];
+	static uint32_t *WREG=&memory[0xFE8];
+
 /*
 typedef struct Opcode Opcode;
 struct Opcode{
@@ -20,7 +26,7 @@ Opcode opcodeTable[256];
 
 
 int movlw(uint32_t code);
-
+int movwf(uint32_t code);
 
 
 
