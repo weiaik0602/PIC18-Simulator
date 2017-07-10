@@ -70,6 +70,7 @@ void test_addwf_expect(void){
 	ShowWREG();        //WREG expected 0x11
 	ShowMemory(0x59E);   //0x59E expected 0x22
 }
+*/
 void test_subwf_expect(void){
 	movlb(0x0105);  //BSR=5
 
@@ -77,9 +78,12 @@ void test_subwf_expect(void){
 	movlw(0x0E11);  //WREG=0x11
 	movwf(0x6F9E);  //memory 0x59E=0x11
 	movwf(0x6E9E);  //memory 0x9E =0x11
+  movlw(0x0E12);
 	subwf(0x5C9E);   //d and a is set to 0
 	ShowWREG();        //WREG expected 0x00
 	ShowMemory(0x9E);   //0x9E expected 0x11
+  ShowC();
+  ShowN();
 	//if a=0 BSR=1
 	movlw(0x0E11);  //WREG=0x11
 	movwf(0x6F9E);  //memory 0x59E=0x11
@@ -102,7 +106,7 @@ void test_subwf_expect(void){
 	ShowWREG();        //WREG expected 0x11
 	ShowMemory(0x59E);   //0x59E expected 0x00
 }
-
+/*
 void test_bcf_expect_wreg_is_0x88(void)
 {
   movlw(0x00FF);
@@ -125,10 +129,45 @@ void test_bsf_expect_wreg_is_0x88(void)
 
 void test_setf_and_clrf_expect(void){
   movlw(0x0088);
+  ShowPC();
   movwf(0x0E14);    //memory 0x14 with the value 0x0088
+  ShowPC();
   ShowMemory(0x14);
   setf(0x6814);     //memory 0x14 expected 0xFF
+  ShowPC();
   ShowMemory(0x14);
   clrf(0x0014);     //memory 0x14 expected 0x00
+  ShowPC();
   ShowMemory(0x14);
+}
+
+void test_btfsc_btfss_expect(void){
+  movlw(0x0080);
+  movwf(0x0E88);   //memory 0x88 with the value 0x80
+  btfss(0x0E88);   //test the 7th bit in the memory 0x88,skip if it is 1
+  movlw(0x00EE);
+  ShowWREG();      //WREG expected 0x80 as we skip the movlw instruction
+
+  movlw(0x00DF);
+  movwf(0x0E88);   //memory 0x88 with the value 0xDF(1101 1111)
+  btfsc(0x0A88);   //test the 5th bit in the memory 0x88,skip if it is 0
+  movlw(0x00EE);
+  ShowWREG();      //WREG expected 0x80 as we skip the movlw instruction
+  ShowPC();
+  nop();
+  nop();
+  nop();
+  nop();
+  ShowPC();
 }*/
+
+void test_movff_expect(void){
+  movlw(0x0044);
+  ShowPC();
+  movwf(0x0E55);
+  ShowPC();
+  movff(0xC055F088);
+  ShowPC();
+  ShowMemory(0x088);
+  ShowMemory(0x055);
+}

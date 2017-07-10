@@ -10,6 +10,15 @@
 	static uint8_t *WREG=&memory[0xFE8];
 	static uint8_t *BSR=&memory[0xFE0];
 
+
+
+  unsigned int PC;
+  unsigned int Skip;
+  unsigned int C;
+  unsigned int DC;
+  unsigned int Z;
+  unsigned int OV;
+  unsigned int N;
 //get value
 unsigned int GetA(uint16_t code);
 unsigned int GetD(uint16_t code);
@@ -27,12 +36,21 @@ void bsf(uint16_t code);
 void setf(uint16_t code);
 void clrf(uint16_t code);
 void btfss(uint16_t code);
-void
-
+void btfsc(uint16_t code);
+void nop();
+void movff(uint32_t code);
 
 //display
-void ShowValue();
+
 void ShowWREG();
 void ShowBSR();
 void ShowMemory(unsigned address);
+void ShowPC();
 #endif // _MAIN_H
+
+
+
+/*
+'body':
+  'ctrl-shift-s': 'window:save-all'
+*/
