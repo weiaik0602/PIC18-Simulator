@@ -5,30 +5,34 @@
 
 
   #define KB 1024
-	char code[8*KB];
+	//char code[8*KB];
 	uint8_t memory[32*KB];
 	static uint8_t *WREG=&memory[0xFE8];
 	static uint8_t *BSR=&memory[0xFE0];
-	//*BSR=0;
-/*
-typedef struct Opcode Opcode;
-struct Opcode{
-  int (*execute)(uint32_t *code);
- // int d;
- // int a;
-};
+
+//get value
+unsigned int GetA(uint16_t code);
+unsigned int GetD(uint16_t code);
+unsigned int ChangeAddressWithBSR(unsigned int address);
+unsigned int GetB(uint16_t code);
+
+//functions
+void movlw(uint16_t code);
+void movwf(uint16_t code);
+void addwf(uint16_t code);
+void movlb(uint16_t code);
+void subwf(uint16_t code);
+void bcf(uint16_t code);
+void bsf(uint16_t code);
+void setf(uint16_t code);
+void clrf(uint16_t code);
+void btfss(uint16_t code);
+void
 
 
-int simulate(uint32_t code);
-Opcode opcodeTable[256];
-*/
-
-
-
-
-int movlw(uint16_t code);
-int movwf(uint16_t code);
-
-
-
+//display
+void ShowValue();
+void ShowWREG();
+void ShowBSR();
+void ShowMemory(unsigned address);
 #endif // _MAIN_H

@@ -1,80 +1,180 @@
 #include "Main.h"
 #include <stdio.h>
 #include <stdint.h>
-//#include "Functions.h"
 
 
+/////////////////////////////////////////////////////////////////////////////
+//get value
 
-
-/*
-int simulate(uint32_t code){
-  int OPCODE=code>>8;
-  Opcode x;
-  //x=opcodeTable[OPCODE](code);
-	//int *simulator=&opcodeTable[OPCODE];
-	//*simulator(code);
-	printf("the address of WREG now is %#06x\n", &opcodeTable[OPCODE]);
-	printf("the address of WREG now is %#06x\n", PICWREG);
-	printf("the value of WREG now is %#06x\n",*PICWREG);
-	printf("the value of code now is %#06x\n",code);
-	printf("the value of opcode now is %#06x\n",OPCODE);
-
-
-
-	return OPCODE;
-
-
-
-
+unsigned int GetA(uint16_t code){
+	return 0x01&(code>>8);
 }
-Opcode opcodeTable[256]={
-	//[0xaa]={addtest,0,0},
-	//[0xbb]={minustest,0,0},
-	[0x0E]={movlw},
-
-
-};
-
-
-  */
-
-
-
-
-   /*
-	*WREG=0x00FF;
-	printf("the address of WREG now is %#06x\n", WREG);
-	printf("the value of WREG now is %#06x\n",*WREG);
-
-	*/
-
-
-int movlw(uint16_t code){
+unsigned int GetD(uint16_t code){
+	return 0x01&(code>>9);
+}
+unsigned int ChangeAddressWithBSR(unsigned int address){
+	unsigned int vBSR=*BSR;
+	vBSR=vBSR<<8;
+	address=address|vBSR;
+	return address;
+}
+unsigned int GetB(uint16_t code){
+	return (code>>9)&0x0007;
+}
+/////////////////////////////////////////////////////////////////////////////
+//functions
+void movlw(uint16_t code){
   unsigned short data;
   data=code&0x00FF;
   *WREG=data;
-  return 0;
 }
-
-int movwf(uint16_t code){
-	int a=0x01&(code>>8);
-	int address=code&0x00FF;
-	uint32_t *FileRegister;
-
-
+void movwf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int address=code&0x00FF;
+	uint8_t *FileRegister;
 
 	if(a==0){
 		FileRegister=&memory[address];
 		*FileRegister=*WREG;
 	}
 	else{
-		*BSR=5;
-		int vBSR=*BSR;
-		vBSR=vBSR<<8;
-		address=address|vBSR;
+		address=ChangeAddressWithBSR(address);
 		FileRegister=&memory[address];
 		*FileRegister=*WREG;
 	}
-// y u so pro '^'
-	return 0;
+
+}
+void addwf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=code&0x00FF;
+	uint8_t *FileRegister;
+
+	if(a==0){
+		FileRegister=&memory[address];
+		if(d==0){
+			*WREG=*WREG+*FileRegister;
+		}
+		else{
+			*FileRegister=*FileRegister+*WREG;
+		}
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		if(d==0){
+			*WREG=*WREG+*FileRegister;
+		}
+		else{
+			*FileRegister=*FileRegister+*WREG;
+		}
+	}
+}
+void movlb(uint16_t code){
+	*BSR=code&0x000F;
+}
+void subwf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=code&0x00FF;
+	uint8_t *FileRegister;
+
+	if(a==0){
+		FileRegister=&memory[address];
+		if(d==0){
+			*WREG=*FileRegister-*WREG;
+		}
+		else{
+			*FileRegister=*FileRegister-*WREG;
+		}
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		if(d==0){
+			*WREG=*FileRegister-*WREG;
+		}
+		else{
+			*FileRegister=*FileRegister-*WREG;
+		}
+	}
+}
+void bcf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int b=GetB(code);
+	unsigned int address=code&0x00FF;
+	uint8_t reset=~(0x01<<b);
+	uint8_t *FileRegister;
+	if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=(*FileRegister&reset);
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		*FileRegister=(*FileRegister&reset);
+	}
+}
+void bsf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int b=GetB(code);
+	unsigned int address=code&0x00FF;
+	uint8_t reset=(0x01<<b);
+	uint8_t *FileRegister;
+	if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=(*FileRegister|reset);
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		*FileRegister=(*FileRegister|reset);
+	}
+}
+void setf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int address=code&0x00FF;
+	uint8_t *FileRegister;
+
+	if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=*FileRegister|0xFF;
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		*FileRegister=*FileRegister|0xFF;
+	}
+}
+void clrf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int address=code&0x00FF;
+	uint8_t *FileRegister;
+
+	if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=*FileRegister&0x00;
+	}
+	else{
+		address=ChangeAddressWithBSR(address);
+		FileRegister=&memory[address];
+		*FileRegister=*FileRegister&0x00;
+	}
+}
+///////////////////////////////////////////////////////////////////////////
+//display
+void ShowValue(){
+	printf("the value of WREG now is %#04x\n",*WREG);
+	printf("the value of BSR now is %#04x\n",*BSR);
+	printf("the value of 0x59E now is %#04x\n",memory[0x59E]);
+
+}
+void ShowWREG(){
+	printf("the value of WREG now is %#04x\n",*WREG);
+}
+void ShowBSR(){
+	printf("the value of BSR now is %#04x\n",*BSR);
+}
+void ShowMemory(unsigned int address){
+	printf("the value of %#04x now is %#04x\n",address,memory[address]);
 }
