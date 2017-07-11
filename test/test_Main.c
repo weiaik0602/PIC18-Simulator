@@ -2,25 +2,24 @@
 #include "Main.h"
 #include <stdio.h>
 #include <stdint.h>
-//#include "Functions.h"
 
 
-void setUp(void){
 
-}
+void setUp(void){}
 
 void tearDown(void){}
 
-/*
+
 void test_movlb_expect_BSR_is_0x05(void)
 {
 	movlb(0x0105);
-	ShowBSR();
+	TEST_ASSERT_EQUAL(*BSR,0x5);
 }
+
 void test_movlw_expect_wreg_is_0x88(void)
 {
 	movlw(0x0F88);
-	ShowWREG();
+	TEST_ASSERT_EQUAL(*WREG,0x88);
 }
 
 void test_movwf_expect(void){
@@ -28,13 +27,13 @@ void test_movwf_expect(void){
 	movlb(0x0105);
 	movlw(0x0F99);
 	movwf(0x6F9E);
-	ShowWREG();
-	ShowMemory(0x59E);
+	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
+	TEST_ASSERT_EQUAL(memory[0x59E],0x99); //expect memory 0x59E with the value 0x99
 //a=0,no BSR
 	movlw(0x0F99);
 	movwf(0x6E9E);
-	ShowWREG();
-	ShowMemory(0x9E);
+	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
+	TEST_ASSERT_EQUAL(memory[0x9E],0x99); //expect memory 0x9E with the value 0x99
 }
 
 
@@ -70,7 +69,7 @@ void test_addwf_expect(void){
 	ShowWREG();        //WREG expected 0x11
 	ShowMemory(0x59E);   //0x59E expected 0x22
 }
-*/
+
 void test_subwf_expect(void){
 	movlb(0x0105);  //BSR=5
 
@@ -105,6 +104,7 @@ void test_subwf_expect(void){
 	subwf(0x5F9E);   //d=1 and a=1
 	ShowWREG();        //WREG expected 0x11
 	ShowMemory(0x59E);   //0x59E expected 0x00
+
 }
 /*
 void test_bcf_expect_wreg_is_0x88(void)
@@ -170,4 +170,5 @@ void test_movff_expect(void){
   ShowPC();
   ShowMemory(0x088);
   ShowMemory(0x055);
+	printf("%#04x",sizeof(int));
 }
