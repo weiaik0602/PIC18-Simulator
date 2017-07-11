@@ -1,7 +1,7 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 #include <stdint.h>
-//#include "Functions.h"
+
 
 
   #define KB 1024
@@ -11,7 +11,7 @@
 	static uint8_t *BSR=&memory[0xFE0];
 
 
-
+  unsigned int Caddress;
   unsigned int PC;
   unsigned int Skip;
   unsigned int C;
