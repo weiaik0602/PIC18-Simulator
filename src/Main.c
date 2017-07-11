@@ -32,7 +32,8 @@ void movlw(uint16_t code){
   data=code&0x00FF;
   *WREG=data;
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void movwf(uint16_t code){
 	if(Skip==1){
@@ -53,7 +54,8 @@ void movwf(uint16_t code){
 		*FileRegister=*WREG;
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void addwf(uint16_t code){
 	if(Skip==1){
@@ -94,7 +96,8 @@ void addwf(uint16_t code){
 		}
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void movlb(uint16_t code){
 	if(Skip==1){
@@ -103,7 +106,8 @@ void movlb(uint16_t code){
 	else{
 	*BSR=code&0x000F;
 	}
-		PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void subwf(uint16_t code){
 	if(Skip==1){
@@ -150,7 +154,8 @@ void subwf(uint16_t code){
 		}
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void bcf(uint16_t code){
 	if(Skip==1){
@@ -194,7 +199,8 @@ void bsf(uint16_t code){
 		*FileRegister=(*FileRegister|reset);
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void setf(uint16_t code){
 	if(Skip==1){
@@ -215,7 +221,8 @@ void setf(uint16_t code){
 		*FileRegister=*FileRegister|0xFF;
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void clrf(uint16_t code){
 	if(Skip==1){
@@ -236,7 +243,8 @@ void clrf(uint16_t code){
 		*FileRegister=*FileRegister&0x00;
 	}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void btfss(uint16_t code){
 	if(Skip==1){
@@ -262,7 +270,8 @@ void btfss(uint16_t code){
 			Skip=1;
 			}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 	}
 }
 void btfsc(uint16_t code){
@@ -289,11 +298,13 @@ void btfsc(uint16_t code){
 			Skip=1;
 			}
 	}
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 	}
 }
 void nop(){
-	PC+=1;
+	PC+=2;
+	Caddress+=2;
 }
 void movff(uint32_t code){
 	if(Skip==1){
@@ -304,7 +315,8 @@ void movff(uint32_t code){
 	unsigned int source=(code>>16)&0xFFF;
 	memory[destination]=memory[source];
 	}
-	PC+=2;
+	PC+=4;
+	Caddress+=4;
 }
 ///////////////////////////////////////////////////////////////////////////
 //display
