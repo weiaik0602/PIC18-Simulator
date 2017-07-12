@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "Main.h"
+#include "Simulator.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -9,7 +9,7 @@ void setUp(void){}
 
 void tearDown(void){}
 
-
+/*
 void test_movlb_expect_BSR_is_0x05(void)
 {
 	movlb(0x0105);
@@ -106,7 +106,7 @@ void test_subwf_expect(void){
 	ShowMemory(0x59E);   //0x59E expected 0x00
 
 }
-/*
+
 void test_bcf_expect_wreg_is_0x88(void)
 {
   movlw(0x00FF);
@@ -159,7 +159,7 @@ void test_btfsc_btfss_expect(void){
   nop();
   nop();
   ShowPC();
-}*/
+}
 
 void test_movff_expect(void){
   movlw(0x0044);
@@ -171,4 +171,14 @@ void test_movff_expect(void){
   ShowMemory(0x088);
   ShowMemory(0x055);
 	printf("%#04x",sizeof(int));
+}*/
+void test_bc_expect(void){
+	C=0;
+	nop();
+	nop();
+	nop();
+	nop();
+	ShowPC();
+	bc(0x00FD);
+	ShowPC();
 }

@@ -1,4 +1,4 @@
-#include "Main.h"
+#include "Simulator.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -318,6 +318,115 @@ void movff(uint32_t code){
 	PC+=4;
 	Caddress+=4;
 }
+void bc(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(C==1){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+void bnc(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(C==0){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+void bz(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(Z==1){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+void bnz(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(Z==0){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+void bov(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(OV==1){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+void bnov(uint16_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+    if(OV==0){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        PC-=step*2;
+      }
+      else
+      PC+=step*2;
+    }
+
+  }
+  PC+=2;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //display
 void ShowWREG(){
@@ -330,7 +439,7 @@ void ShowMemory(unsigned int address){
 	printf("the value of %#04x now is %#04x\n",address,memory[address]);
 }
 void ShowPC(){
-	printf("the value of PC now is %d\n",PC);
+	printf("the value of PC now is %#04x\n",PC);
 }
 void ShowC(){
 	printf("the value of C now is %d\n",C);

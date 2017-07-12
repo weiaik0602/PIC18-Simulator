@@ -1,5 +1,6 @@
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef _SIMULATOR_H
+#define _SIMULATOR_H
+
 #include <stdint.h>
 
 
@@ -39,6 +40,12 @@ void btfss(uint16_t code);
 void btfsc(uint16_t code);
 void nop();
 void movff(uint32_t code);
+void bc(uint16_t code);
+void bnc(uint16_t code);
+void bnz(uint16_t code);
+void bz(uint16_t code);
+void bov(uint16_t code);
+void bnov(uint16_t code);
 
 //display
 
@@ -46,7 +53,7 @@ void ShowWREG();
 void ShowBSR();
 void ShowMemory(unsigned address);
 void ShowPC();
-#endif // _MAIN_H
+
 
 
 
@@ -54,3 +61,5 @@ void ShowPC();
 'body':
   'ctrl-shift-s': 'window:save-all'
 */
+
+#endif // _SIMULATOR_H
