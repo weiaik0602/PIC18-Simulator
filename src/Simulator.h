@@ -4,23 +4,49 @@
 #include <stdint.h>
 
 
+uint8_t PCL;
+uint8_t PCLATH;
+uint8_t PCLATU;
 
-  #define KB 1024
+#define KB 1024
+#define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
+
+#define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
+
+
+
+
+
+
+
+
+
+typedef struct StatusReg StatusReg;
+struct StatusReg{
+  uint8_t C:1;
+  uint8_t DC:1;
+  uint8_t Z:1;
+  uint8_t OV:1;
+  uint8_t N:1;
+};
+
+StatusReg Status;
+
 	//char code[8*KB];
 	uint8_t memory[32*KB];
 	static uint8_t *WREG=&memory[0xFE8];
 	static uint8_t *BSR=&memory[0xFE0];
 
 
-  unsigned int Caddress;
-  unsigned int PC;
+
+
+  //unsigned int Caddress;
+  //unsigned int PC;
   unsigned int Skip;
-  unsigned int C;
-  unsigned int DC;
-  unsigned int Z;
-  unsigned int OV;
-  unsigned int N;
+
+
 //get value
+void SET_PC(int newAddr);
 unsigned int GetA(uint16_t code);
 unsigned int GetD(uint16_t code);
 unsigned int ChangeAddressWithBSR(unsigned int address);

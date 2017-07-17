@@ -3,6 +3,9 @@
 #include <stdint.h>
 
 
+
+
+
 /////////////////////////////////////////////////////////////////////////////
 //get value
 
@@ -21,6 +24,13 @@ unsigned int ChangeAddressWithBSR(unsigned int address){
 unsigned int GetB(uint16_t code){
 	return (code>>9)&0x0007;
 }
+
+void SET_PC(int newAddr){
+  PCL=newAddr&0xFF;
+  PCLATH=(newAddr>>8)&0xFF;
+  PCLATU=(newAddr>>16)&0xFF;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //functions
 void movlw(uint16_t code){
@@ -32,8 +42,8 @@ void movlw(uint16_t code){
   data=code&0x00FF;
   *WREG=data;
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
+
 }
 void movwf(uint16_t code){
 	if(Skip==1){
@@ -54,8 +64,8 @@ void movwf(uint16_t code){
 		*FileRegister=*WREG;
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
+
 }
 void addwf(uint16_t code){
 	if(Skip==1){
@@ -74,14 +84,14 @@ void addwf(uint16_t code){
 			result=*WREG+*FileRegister;
 			*WREG=result;
 			if(result>0xFF){
-				C=1;
+				Status.C=1;
 			}
 		}
 		else{
 			result=*WREG+*FileRegister;
 			*FileRegister=result;
 			if(result>0xFF){
-				C=1;
+				Status.C=1;
 			}
 		}
 		}
@@ -96,8 +106,8 @@ void addwf(uint16_t code){
 		}
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
+
 }
 void movlb(uint16_t code){
 	if(Skip==1){
@@ -106,8 +116,7 @@ void movlb(uint16_t code){
 	else{
 	*BSR=code&0x000F;
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void subwf(uint16_t code){
 	if(Skip==1){
@@ -126,20 +135,20 @@ void subwf(uint16_t code){
 			result=*FileRegister-*WREG;
 			*WREG=result;
 			if(result>=0x00)
-				C=1;
+				Status.C=1;
 			if(result<0x00){
-				N=1;
-				C=0;
+				Status.N=1;
+				Status.C=0;
 			}
 		}
 		else{
 			result=*FileRegister-*WREG;
 			*FileRegister=result;
 			if(result>=0x00)
-				C=1;
+				Status.C=1;
 			if(result<0x00){
-				N=1;
-				C=0;
+				Status.N=1;
+				Status.C=0;
 			}
 		}
 		}
@@ -154,8 +163,7 @@ void subwf(uint16_t code){
 		}
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void bcf(uint16_t code){
 	if(Skip==1){
@@ -177,7 +185,7 @@ void bcf(uint16_t code){
 		*FileRegister=(*FileRegister&reset);
 	}
 	}
-	PC+=1;
+	ADD_PC(1);
 }
 void bsf(uint16_t code){
 	if(Skip==1){
@@ -199,8 +207,7 @@ void bsf(uint16_t code){
 		*FileRegister=(*FileRegister|reset);
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void setf(uint16_t code){
 	if(Skip==1){
@@ -221,8 +228,7 @@ void setf(uint16_t code){
 		*FileRegister=*FileRegister|0xFF;
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void clrf(uint16_t code){
 	if(Skip==1){
@@ -243,8 +249,7 @@ void clrf(uint16_t code){
 		*FileRegister=*FileRegister&0x00;
 	}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void btfss(uint16_t code){
 	if(Skip==1){
@@ -270,8 +275,7 @@ void btfss(uint16_t code){
 			Skip=1;
 			}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 	}
 }
 void btfsc(uint16_t code){
@@ -298,13 +302,11 @@ void btfsc(uint16_t code){
 			Skip=1;
 			}
 	}
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 	}
 }
 void nop(){
-	PC+=2;
-	Caddress+=2;
+	ADD_PC(1);
 }
 void movff(uint32_t code){
 	if(Skip==1){
@@ -315,118 +317,117 @@ void movff(uint32_t code){
 	unsigned int source=(code>>16)&0xFFF;
 	memory[destination]=memory[source];
 	}
-	PC+=4;
-	Caddress+=4;
+	ADD_PC(2);
 }
 void bc(uint16_t code){
   if(Skip==1){
     Skip=0;
   }
   else{
-    if(C==1){
+    if(Status.C==1){
       uint8_t step=code&0xFF;
       if(step>0xF0){
         step=~(step-1);
-        PC-=step*2;
+        ADD_PC(-step);
       }
       else
-      PC+=step*2;
+      ADD_PC(step+1);
     }
-
+		else
+		ADD_PC(1);
   }
-  PC+=2;
 }
-void bnc(uint16_t code){
-  if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(C==0){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        PC-=step*2;
-      }
-      else
-      PC+=step*2;
-    }
 
-  }
-  PC+=2;
+void bnc(uint16_t code){
+if(Skip==1){
+	Skip=0;
+}
+else{
+	if(Status.C==0){
+		uint8_t step=code&0xFF;
+		if(step>0xF0){
+			step=~(step-1);
+			ADD_PC(-step);
+		}
+		else
+		ADD_PC(step+1);
+	}
+	else
+	ADD_PC(1);
+}
 }
 void bz(uint16_t code){
-  if(Skip==1){
+	if(Skip==1){
     Skip=0;
   }
   else{
-    if(Z==1){
+    if(Status.Z==1){
       uint8_t step=code&0xFF;
       if(step>0xF0){
         step=~(step-1);
-        PC-=step*2;
+        ADD_PC(-step);
       }
       else
-      PC+=step*2;
+      ADD_PC(step+1);
     }
-
+		else
+		ADD_PC(1);
   }
-  PC+=2;
 }
 void bnz(uint16_t code){
-  if(Skip==1){
+	if(Skip==1){
     Skip=0;
   }
   else{
-    if(Z==0){
+    if(Status.Z==0){
       uint8_t step=code&0xFF;
       if(step>0xF0){
         step=~(step-1);
-        PC-=step*2;
+        ADD_PC(-step);
       }
       else
-      PC+=step*2;
+      ADD_PC(step+1);
     }
-
+		else
+		ADD_PC(1);
   }
-  PC+=2;
 }
 void bov(uint16_t code){
-  if(Skip==1){
+	if(Skip==1){
     Skip=0;
   }
   else{
-    if(OV==1){
+    if(Status.OV==1){
       uint8_t step=code&0xFF;
       if(step>0xF0){
         step=~(step-1);
-        PC-=step*2;
+        ADD_PC(-step);
       }
       else
-      PC+=step*2;
+      ADD_PC(step+1);
     }
-
+		else
+		ADD_PC(1);
   }
-  PC+=2;
 }
 void bnov(uint16_t code){
-  if(Skip==1){
+	if(Skip==1){
     Skip=0;
   }
   else{
-    if(OV==0){
+    if(Status.OV==0){
       uint8_t step=code&0xFF;
       if(step>0xF0){
         step=~(step-1);
-        PC-=step*2;
+        ADD_PC(-step);
       }
       else
-      PC+=step*2;
+      ADD_PC(step+1);
     }
-
+		else
+		ADD_PC(1);
   }
-  PC+=2;
 }
-
 ///////////////////////////////////////////////////////////////////////////
 //display
 void ShowWREG(){
@@ -439,11 +440,11 @@ void ShowMemory(unsigned int address){
 	printf("the value of %#04x now is %#04x\n",address,memory[address]);
 }
 void ShowPC(){
-	printf("the value of PC now is %#04x\n",PC);
+	printf("the value of PC now is %#04x\n",GET_PC());
 }
 void ShowC(){
-	printf("the value of C now is %d\n",C);
+	printf("the value of C now is %d\n",Status.C);
 }
 void ShowN(){
-	printf("the value of N now is %d\n",N);
+	printf("the value of N now is %d\n",Status.N);
 }

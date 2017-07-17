@@ -9,33 +9,39 @@ void setUp(void){}
 
 void tearDown(void){}
 
-/*
+
 void test_movlb_expect_BSR_is_0x05(void)
 {
-	movlb(0x0105);
+	uint32_t code[]={0x0105};
+	movlb(*code);
 	TEST_ASSERT_EQUAL(*BSR,0x5);
 }
 
 void test_movlw_expect_wreg_is_0x88(void)
 {
-	movlw(0x0F88);
+	uint32_t code[]={0x0F88};
+	movlw(*code);
 	TEST_ASSERT_EQUAL(*WREG,0x88);
 }
 
 void test_movwf_expect(void){
+	uint32_t code[]={
+		0x0105, 0x0F99,0x6F9E,  //movlb 0x5 , movlw 0x99 , movwf 0x9E,BANKED
+		0x0F99, 0x6E9E};        //movlw 0x99, movwf 0x9E,ACCESS
+	uint32_t *ptr=code;
 	//a=1 BSR=5
-	movlb(0x0105);
-	movlw(0x0F99);
-	movwf(0x6F9E);
-	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
+	movlb(*ptr);
+	movlw(*(ptr+1));
+	movwf(*(ptr+2));
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x99);    //expect WREG with the value 0x99
 	TEST_ASSERT_EQUAL(memory[0x59E],0x99); //expect memory 0x59E with the value 0x99
 //a=0,no BSR
-	movlw(0x0F99);
-	movwf(0x6E9E);
+	movlw(*(ptr+3));
+	movwf(*(ptr+4));
 	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
 	TEST_ASSERT_EQUAL(memory[0x9E],0x99); //expect memory 0x9E with the value 0x99
 }
-
+/*
 
 void test_addwf_expect(void){
 	movlb(0x0105);  //BSR=5
@@ -81,8 +87,8 @@ void test_subwf_expect(void){
 	subwf(0x5C9E);   //d and a is set to 0
 	ShowWREG();        //WREG expected 0x00
 	ShowMemory(0x9E);   //0x9E expected 0x11
-  ShowC();
-  ShowN();
+  //ShowC();
+  //ShowN();
 	//if a=0 BSR=1
 	movlw(0x0E11);  //WREG=0x11
 	movwf(0x6F9E);  //memory 0x59E=0x11
@@ -171,14 +177,23 @@ void test_movff_expect(void){
   ShowMemory(0x088);
   ShowMemory(0x055);
 	printf("%#04x",sizeof(int));
-}*/
-void test_bc_expect(void){
-	C=0;
-	nop();
-	nop();
-	nop();
-	nop();
-	ShowPC();
-	bc(0x00FD);
-	ShowPC();
 }
+
+void test_bc_expect(void){
+	//Status.C=0;
+	movlw(0x0055);
+	nop();
+	nop();
+	nop();
+	nop();
+	nop();
+	ShowPC();
+	bc(0x0001);
+	ShowPC();
+	//system("break");
+}
+void test_bnc_expect(void){
+	//Status.C=0;
+	ShowWREG();
+	//system("clear");
+}*/
