@@ -40,8 +40,6 @@ StatusReg Status;
 
 
 
-  //unsigned int Caddress;
-  //unsigned int PC;
   unsigned int Skip;
 
 
@@ -51,6 +49,10 @@ unsigned int GetA(uint16_t code);
 unsigned int GetD(uint16_t code);
 unsigned int ChangeAddressWithBSR(unsigned int address);
 unsigned int GetB(uint16_t code);
+
+int GetValue(int a,unsigned int address);
+void storeFileReg(int d,int a,uint8_t value,uint8_t address);
+int rawAdd(int v1,int v2);
 
 //functions
 void movlw(uint16_t code);

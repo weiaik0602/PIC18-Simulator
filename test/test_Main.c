@@ -24,6 +24,33 @@ void test_movlw_expect_wreg_is_0x88(void)
 	TEST_ASSERT_EQUAL(*WREG,0x88);
 }
 
+void test_storeFileReg_d0_a0_88_ff_expect_88inWREG(void){
+	storeFileReg(0,0,0x88,0xFF);
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x88);
+}
+
+void test_storeFileReg_d0_a1_88_ff_expect_88inWREG(void){
+	storeFileReg(0,1,0x88,0xFF);
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x88);
+}
+void test_storeFileReg_d1_a0_88_ff_expect_88in0xFF(void){
+	storeFileReg(1,0,0x88,0xFF);
+	TEST_ASSERT_EQUAL_HEX16(memory[0xFF],0x88);
+}
+void test_storeFileReg_d1_a1_88_ff_expect_88in0x5FF(void){
+	BSR=5;
+	storeFileReg(1,1,0x88,0xFF);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x5FF],0x88);
+}
+
+void test_rawAdd_0x11_0x11_expect_0x22(void){
+	int v1=0x11;
+	int v2=0x11;
+	unsigned int result=rawAdd(v1,v2);
+	TEST_ASSERT_EQUAL_HEX16(result,0x22);
+}
+
+
 void test_movwf_expect(void){
 	uint32_t code[]={
 		0x0105, 0x0F99,0x6F9E,  //movlb 0x5 , movlw 0x99 , movwf 0x9E,BANKED
@@ -35,14 +62,21 @@ void test_movwf_expect(void){
 	movwf(*(ptr+2));
 	TEST_ASSERT_EQUAL_HEX16(*WREG,0x99);    //expect WREG with the value 0x99
 	TEST_ASSERT_EQUAL(memory[0x59E],0x99); //expect memory 0x59E with the value 0x99
-//a=0,no BSR
+	//a=0,no BSR
 	movlw(*(ptr+3));
 	movwf(*(ptr+4));
 	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
 	TEST_ASSERT_EQUAL(memory[0x9E],0x99); //expect memory 0x9E with the value 0x99
 }
-/*
 
+void test_addwf_expect(void){
+	uint32_t code[]={0x2612};
+	*WREG=0x22;
+	memory[0x12]=0x33;
+	addwf(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x55);
+}
+/*
 void test_addwf_expect(void){
 	movlb(0x0105);  //BSR=5
 
@@ -59,7 +93,7 @@ void test_addwf_expect(void){
 	movwf(0x6E9E);  //memory 0x9E =0x11
 	addwf(0x269E);   //d=1 and a=0
 	ShowWREG();        //WREG expected 0x11
-	ShowMemory(0x9E);   //0x9E expected 0x22
+	ShowMemory(0x9E);   //0x9E exp ected 0x22
 	//if a=1 BSR=0
 	movlw(0x0E11);  //WREG=0x11
 	movwf(0x6F9E);  //memory 0x59E=0x11

@@ -30,6 +30,37 @@ void SET_PC(int newAddr){
   PCLATH=(newAddr>>8)&0xFF;
   PCLATU=(newAddr>>16)&0xFF;
 }
+void storeFileReg(int d,int a,uint8_t value,uint8_t address){
+	uint8_t *FileRegister;
+	unsigned int newaddress;
+	if(d==0)
+			*WREG=value;
+	else{
+		if(a==0){
+		FileRegister=&memory[address];
+		*FileRegister=value;
+		}
+		else{
+			newaddress=ChangeAddressWithBSR(address);
+			FileRegister=&memory[newaddress];
+			*FileRegister=value;
+		}
+	}
+}
+
+int GetValue(int a,unsigned int address){
+	uint8_t *FileRegister;
+	unsigned int newaddress;
+	if(a==0)
+		return memory[address];
+	else{
+		newaddress=ChangeAddressWithBSR(address);
+		return memory[newaddress];
+	}
+}
+int rawAdd(int v1,int v2){
+	return (v1)+(v2);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //functions
@@ -78,36 +109,12 @@ void addwf(uint16_t code){
 	unsigned int result;
 	uint8_t *FileRegister;
 
-	if(a==0){
-		FileRegister=&memory[address];
-		if(d==0){
-			result=*WREG+*FileRegister;
-			*WREG=result;
-			if(result>0xFF){
-				Status.C=1;
-			}
-		}
-		else{
-			result=*WREG+*FileRegister;
-			*FileRegister=result;
-			if(result>0xFF){
-				Status.C=1;
-			}
-		}
-		}
-	else{
-		address=ChangeAddressWithBSR(address);
-		FileRegister=&memory[address];
-		if(d==0){
-			*WREG=*WREG+*FileRegister;
-		}
-		else{
-			*FileRegister=*FileRegister+*WREG;
-		}
-	}
+	int v1=GetValue(a,address);
+	int v2=*WREG;
+	result=rawAdd(v1,v2);
+	storeFileReg(d,a,result,address);
 	}
 	ADD_PC(1);
-
 }
 void movlb(uint16_t code){
 	if(Skip==1){
