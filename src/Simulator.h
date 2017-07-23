@@ -51,6 +51,7 @@ unsigned int ChangeAddressWithBSR(unsigned int address);
 unsigned int GetB(uint16_t code);
 
 int GetValue(int a,unsigned int address);
+void rawBranch(int y,int x,uint8_t code);
 void storeFileReg(int d,int a,uint8_t value,uint8_t address);
 int rawAdd(int v1,int v2);
 
@@ -81,7 +82,7 @@ void ShowWREG();
 void ShowBSR();
 void ShowMemory(unsigned address);
 void ShowPC();
-
+void ShowStatus();
 
 
 

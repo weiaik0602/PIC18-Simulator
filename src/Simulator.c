@@ -47,9 +47,38 @@ void storeFileReg(int d,int a,uint8_t value,uint8_t address){
 		}
 	}
 }
-
+void rawBranch(int y,int x,uint8_t code){
+  if(Skip==1){
+    Skip=0;
+  }
+  else{
+		unsigned int identifier;
+		switch(y){
+		case 0:identifier=Status.C;
+						break;
+		case 1:identifier=Status.DC;
+						break;
+		case 2:identifier=Status.Z;
+						break;
+		case 3:identifier=Status.OV;
+						break;
+		case 4:identifier=Status.N;
+						break;
+					}
+    if(identifier==x){
+      uint8_t step=code&0xFF;
+      if(step>0xF0){
+        step=~(step-1);
+        ADD_PC(-step);
+      }
+      else
+      ADD_PC(step+1);
+    }
+		else
+		ADD_PC(1);
+  }
+}
 int GetValue(int a,unsigned int address){
-	uint8_t *FileRegister;
 	unsigned int newaddress;
 	if(a==0)
 		return memory[address];
@@ -64,6 +93,15 @@ int rawAdd(int v1,int v2){
 
 /////////////////////////////////////////////////////////////////////////////
 //functions
+void movlb(uint16_t code){
+	if(Skip==1){
+			Skip=0;
+	}
+	else{
+	*BSR=code&0x000F;
+	}
+	ADD_PC(1);
+}
 void movlw(uint16_t code){
 	if(Skip==1){
 		Skip=0;
@@ -113,15 +151,9 @@ void addwf(uint16_t code){
 	int v2=*WREG;
 	result=rawAdd(v1,v2);
 	storeFileReg(d,a,result,address);
+	if(result>0x100){
+		Status.C=1;
 	}
-	ADD_PC(1);
-}
-void movlb(uint16_t code){
-	if(Skip==1){
-			Skip=0;
-	}
-	else{
-	*BSR=code&0x000F;
 	}
 	ADD_PC(1);
 }
@@ -133,41 +165,15 @@ void subwf(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
-	int result;
+	unsigned int result;
 	uint8_t *FileRegister;
 
-	if(a==0){
-		FileRegister=&memory[address];
-		if(d==0){
-			result=*FileRegister-*WREG;
-			*WREG=result;
-			if(result>=0x00)
-				Status.C=1;
-			if(result<0x00){
-				Status.N=1;
-				Status.C=0;
-			}
-		}
-		else{
-			result=*FileRegister-*WREG;
-			*FileRegister=result;
-			if(result>=0x00)
-				Status.C=1;
-			if(result<0x00){
-				Status.N=1;
-				Status.C=0;
-			}
-		}
-		}
-	else{
-		address=ChangeAddressWithBSR(address);
-		FileRegister=&memory[address];
-		if(d==0){
-			*WREG=*WREG+*FileRegister;
-		}
-		else{
-			*FileRegister=*FileRegister+*WREG;
-		}
+	int v1=GetValue(a,address);
+	int v2=*WREG;
+	result=rawAdd(v1,-v2);
+	storeFileReg(d,a,result,address);
+	if(result>0xFF){
+		Status.N=1;
 	}
 	}
 	ADD_PC(1);
@@ -266,7 +272,6 @@ void btfss(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int b=GetB(code);
 	unsigned int address=code&0x00FF;
-	//uint8_t reset=(0x01<<b);
 	uint8_t *FileRegister;
 	if(a==0){
 		FileRegister=&memory[address];
@@ -313,6 +318,9 @@ void btfsc(uint16_t code){
 	}
 }
 void nop(){
+	if(Skip==1){
+		Skip=0;
+	}
 	ADD_PC(1);
 }
 void movff(uint32_t code){
@@ -327,113 +335,23 @@ void movff(uint32_t code){
 	ADD_PC(2);
 }
 void bc(uint16_t code){
-  if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(Status.C==1){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
-  }
+  rawBranch(0,1,code);
 }
 
 void bnc(uint16_t code){
-if(Skip==1){
-	Skip=0;
-}
-else{
-	if(Status.C==0){
-		uint8_t step=code&0xFF;
-		if(step>0xF0){
-			step=~(step-1);
-			ADD_PC(-step);
-		}
-		else
-		ADD_PC(step+1);
-	}
-	else
-	ADD_PC(1);
-}
+	rawBranch(0,0,code);
 }
 void bz(uint16_t code){
-	if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(Status.Z==1){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
-  }
+	rawBranch(2,1,code);
 }
 void bnz(uint16_t code){
-	if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(Status.Z==0){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
-  }
+	rawBranch(2,0,code);
 }
 void bov(uint16_t code){
-	if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(Status.OV==1){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
-  }
+	rawBranch(3,1,code);
 }
 void bnov(uint16_t code){
-	if(Skip==1){
-    Skip=0;
-  }
-  else{
-    if(Status.OV==0){
-      uint8_t step=code&0xFF;
-      if(step>0xF0){
-        step=~(step-1);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
-  }
+		rawBranch(3,0,code);
 }
 ///////////////////////////////////////////////////////////////////////////
 //display
@@ -454,4 +372,7 @@ void ShowC(){
 }
 void ShowN(){
 	printf("the value of N now is %d\n",Status.N);
+}
+void ShowStatus(){
+	printf("%#04x\n",Status );
 }
