@@ -73,102 +73,126 @@ void test_addwf_expect_0xFE_C_1(void){
 	*WREG=0xFF;
 	memory[0x12]=0xFF;
 	addwf(*code);
-	TEST_ASSERT_EQUAL(Status.C,1);
+	TEST_ASSERT_EQUAL(Status->C,1);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xFE);
 }
 
-void test_subwf_expect(void){
+void test_subwf_0x11minus0x22_expect_0xEF_N_1(void){
 	uint32_t code[]={0x2212};
 	*WREG=0x22;
 	memory[0x12]=0x11;
 	subwf(*code);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xEF);
-	TEST_ASSERT_EQUAL(Status.N,1);
-	
+	TEST_ASSERT_EQUAL(Status->N,1);
 }
-/*
 
-void test_bcf_expect_wreg_is_0x88(void)
+
+void test_bcf_expect_0xBF(void)
 {
-  movlw(0x00FF);
-  movwf(0x0E11);   //memory 0x11 with the value 0xFF
-  ShowWREG();
-  ShowMemory(0x11);
-	bcf(0x9C11);      //clear the 6th bit of the memory ox11
-	ShowMemory(0x11);   //memory 0x11 now expected 0xBF(1111 1111 -> 1011 1111)
+	uint32_t code[]={0x9C11};
+  memory[0x11]=0xFF;
+	bcf(*code);      //clear the 6th bit of the memory ox11
+	TEST_ASSERT_EQUAL_HEX16(memory[0x11],0xBF);   //memory 0x11 now expected 0xBF(1111 1111 -> 1011 1111)
 }
 
-void test_bsf_expect_wreg_is_0x88(void)
+void test_bsf_expect_0x40(void)
 {
-  movlw(0x0000);
-  movwf(0x0E11);   //memory 0x11 with the value 0x00
-  ShowWREG();
-  ShowMemory(0x11);
-	bsf(0x8C11);      //set the 6th bit of the memory ox11
-	ShowMemory(0x11);   //memory 0x11 now expected 0x40(0000 0000  -> 0100 0000)
+	uint32_t code[]={0x8C11};
+  memory[0x11]=0x00;
+	bsf(*code);      //set the 6th bit of the memory ox11
+	TEST_ASSERT_EQUAL_HEX16(memory[0x11],0x40);   //memory 0x11 now expected 0x40(0000 0000  -> 0100 0000)
 }
 
-void test_setf_and_clrf_expect(void){
-  movlw(0x0088);
-  ShowPC();
-  movwf(0x0E14);    //memory 0x14 with the value 0x0088
-  ShowPC();
-  ShowMemory(0x14);
-  setf(0x6814);     //memory 0x14 expected 0xFF
-  ShowPC();
-  ShowMemory(0x14);
-  clrf(0x0014);     //memory 0x14 expected 0x00
-  ShowPC();
-  ShowMemory(0x14);
+void test_setf_expect_0xFF(void){
+	uint32_t code[]={0x6814};
+  memory[0x14]=0x89;
+  setf(*code);     //memory 0x14 expected 0xFF
+	TEST_ASSERT_EQUAL_HEX16(memory[0x14],0xFF);
+}
+void test_clrf_expect_0x00(void){
+	uint32_t code[]={0x0014};
+  memory[0x14]=0x89;
+  clrf(*code);     //memory 0x14 expected 0x00
+	TEST_ASSERT_EQUAL_HEX16(memory[0x14],0x00);
+}
+void test_movff_expect_0x44_moved_to_0x88(void){
+	uint32_t code[]={0xC055F088};
+	memory[0x55]=0x44;
+  movff(*code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x88],0x44);
 }
 
-void test_btfsc_btfss_expect(void){
-  movlw(0x0080);
-  movwf(0x0E88);   //memory 0x88 with the value 0x80
-  btfss(0x0E88);   //test the 7th bit in the memory 0x88,skip if it is 1
-  movlw(0x00EE);
-  ShowWREG();      //WREG expected 0x80 as we skip the movlw instruction
+void test_btfss_expect_skip(void){
+	uint32_t code[]={0x0E88,0x00EE};
+  memory[0x88]=0x80;
+	*WREG=0x80;
+  btfss(*code);   //test the 7th bit in the memory 0x88,skip if it is 1
+  movlw(*(code+1));
+  TEST_ASSERT_EQUAL_HEX16(*WREG,0x80) ;     //WREG expected 0x80 as we skip the movlw instruction
 
-  movlw(0x00DF);
-  movwf(0x0E88);   //memory 0x88 with the value 0xDF(1101 1111)
-  btfsc(0x0A88);   //test the 5th bit in the memory 0x88,skip if it is 0
-  movlw(0x00EE);
-  ShowWREG();      //WREG expected 0x80 as we skip the movlw instruction
-  ShowPC();
-  nop();
-  nop();
-  nop();
-  nop();
-  ShowPC();
+}
+void test_btfsc_expect_skip(void){
+	uint32_t code[]={0x0A88,0x00EE};
+  memory[0x88]=0xDF;    //memory 0x88 with the value 0xDF(1101 1111)
+	*WREG=0x80;
+  btfsc(*code);   //test the 5th bit in the memory 0x88,skip if it is 0
+	TEST_ASSERT_EQUAL(Skip,1);
+	movlw(*(code+1));
+  TEST_ASSERT_EQUAL_HEX16(*WREG,0x80) ;//WREG expected 0x80 as we skip the movlw instruction
 }
 
-void test_movff_expect(void){
-  movlw(0x0044);
-  ShowPC();
-  movwf(0x0E55);
-  ShowPC();
-  movff(0xC055F088);
-  ShowPC();
-  ShowMemory(0x088);
-  ShowMemory(0x055);
-	printf("%#04x",sizeof(int));
+
+void test_bc_expect_PC_0x08(void){
+	uint32_t code[]={0x0055,0x0000,0x0001};
+	CLEAR_PC();
+	movlw(*code);
+	nop(*(code+1));
+	bc(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
+}
+void test_bnc_expect_PC_0x00(void){
+	uint32_t code[]={0x0055,0x0000,0x0080};
+	CLEAR_PC();
+	Status->C=0;
+	//movlw(*code);
+	ShowPC();
+	ADD_PC(128);
+	ShowPC();
+	bnc(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
+}/*
+void test_bz_expect_PC_0x08(void){
+	uint32_t code[]={0x0055,0x0000,0x0001};
+	CLEAR_PC();
+	Status.Z=1;
+	movlw(*code);
+	nop(*(code+1));
+	bz(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
+}
+void test_bnz_expect_PC_0x00(void){
+	uint32_t code[]={0x0055,0x0000,0x00FE};
+	CLEAR_PC();
+	Status.Z=0;
+	movlw(*code);
+	bnz(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
+}
+void test_bov_expect_PC_0x08(void){
+	uint32_t code[]={0x0055,0x0000,0x0001};
+	CLEAR_PC();
+	Status.OV=1;
+	movlw(*code);
+	nop(*(code+1));
+	bov(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
+}
+void test_bnov_expect_PC_0x00(void){
+	uint32_t code[]={0x0055,0x0000,0x00FE};
+	CLEAR_PC();
+	Status.OV=0;
+	movlw(*code);
+	bnov(*(code+2));
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
 }
 */
-void test_bc_expect(void){
-	Status.C=1;
-	movlw(0x0055);
-	nop();
-	nop();
-	nop();
-	nop();
-	nop();
-	ShowPC();
-	bnc(0x0001);
-	ShowPC();
-	//system("break");
-}/*
-void test_bnc_expect(void){
-	//Status.C=0;
-	ShowWREG();
-	//system("clear");
-}*/

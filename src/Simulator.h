@@ -10,14 +10,17 @@ uint8_t PCLATU;
 
 #define KB 1024
 #define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
-
 #define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
 
 
+extern uint8_t memory[];
+#define Status    ((StatusReg*)&memory[0xFD8])
+#define WREG      (&memory[0xFE8])
+#define BSR       (&memory[0xFE0])
 
-
-
-
+#define C_Bit      0
+#define OV_Bit     3
+#define Z_Bit      2
 
 
 
@@ -30,13 +33,11 @@ struct StatusReg{
   uint8_t N:1;
 };
 
-StatusReg Status;
+
 
 	//char code[8*KB];
-	uint8_t memory[32*KB];
-	static uint8_t *WREG=&memory[0xFE8];
-	static uint8_t *BSR=&memory[0xFE0];
 
+  //static uint8_t *Status=&memory[0xFD8];
 
 
 
@@ -45,16 +46,18 @@ StatusReg Status;
 
 //get value
 void SET_PC(int newAddr);
+void CLEAR_PC();
 unsigned int GetA(uint16_t code);
 unsigned int GetD(uint16_t code);
-unsigned int ChangeAddressWithBSR(unsigned int address);
 unsigned int GetB(uint16_t code);
+unsigned int ChangeAddressWithBSR(unsigned int address);
+
 
 int GetValue(int a,unsigned int address);
-void rawBranch(int y,int x,uint8_t code);
+void rawCondBranch(int CondBit,int ExpectedBit,uint16_t code);
 void storeFileReg(int d,int a,uint8_t value,uint8_t address);
 int rawAdd(int v1,int v2);
-
+void rawBitTestSkip(int x,uint16_t code);
 //functions
 void movlw(uint16_t code);
 void movwf(uint16_t code);
@@ -67,7 +70,7 @@ void setf(uint16_t code);
 void clrf(uint16_t code);
 void btfss(uint16_t code);
 void btfsc(uint16_t code);
-void nop();
+void nop(uint16_t code);
 void movff(uint32_t code);
 void bc(uint16_t code);
 void bnc(uint16_t code);
