@@ -35,11 +35,6 @@ struct StatusReg{
 
 
 
-	//char code[8*KB];
-
-  //static uint8_t *Status=&memory[0xFD8];
-
-
 
   unsigned int Skip;
 
@@ -51,13 +46,12 @@ unsigned int GetA(uint16_t code);
 unsigned int GetD(uint16_t code);
 unsigned int GetB(uint16_t code);
 unsigned int ChangeAddressWithBSR(unsigned int address);
-
-
 int GetValue(int a,unsigned int address);
 void rawCondBranch(int CondBit,int ExpectedBit,uint16_t code);
 void storeFileReg(int d,int a,uint8_t value,uint8_t address);
 int rawAdd(int v1,int v2);
 void rawBitTestSkip(int x,uint16_t code);
+void ClrStatus();
 //functions
 void movlw(uint16_t code);
 void movwf(uint16_t code);
@@ -78,7 +72,8 @@ void bnz(uint16_t code);
 void bz(uint16_t code);
 void bov(uint16_t code);
 void bnov(uint16_t code);
-
+void addwfc(uint16_t code);
+void andwf(uint16_t code);
 //display
 
 void ShowWREG();
