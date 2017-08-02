@@ -49,7 +49,7 @@ unsigned int ChangeAddressWithBSR(unsigned int address);
 int GetValue(int a,unsigned int address);
 void rawCondBranch(int CondBit,int ExpectedBit,uint16_t code);
 void storeFileReg(int d,int a,uint8_t value,uint8_t address);
-int rawAdd(int v1,int v2);
+char rawAdd(uint16_t v1,uint16_t v2);
 void rawBitTestSkip(int x,uint16_t code);
 void ClrStatus();
 //functions

@@ -75,14 +75,14 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint16_t code){
 		else
 		ADD_PC(1);
 }
-int rawAdd(int v1,int v2){
-	int result;
-	char realresult;
-	char decimalresult;
+char rawAdd(uint16_t v1,uint16_t v2){
+	uint16_t result;
+	uint8_t realresult;
+	uint8_t decimalresult;
 	result= (v1)+(v2);
 	realresult=result&0xFF;
 	decimalresult=(v1&0xF)+(v2&0xF);
-	if(result>0x100){
+	if(result>0xFF){
 		Status->C=1;
 	}
 	if(decimalresult>0xF){
@@ -91,8 +91,14 @@ int rawAdd(int v1,int v2){
 	if(realresult==0){
 		Status->Z=1;
 	}
-	if(realresult<0){
+	if(realresult>0x79){   //0x80 to 0xFF is negative num
 		Status->N=1;
+	}
+	if(v1<0x80&&v2<0x80&&realresult>0x79){   //v1(pos)+v2(pos)=neg
+		Status->OV=1;
+	}
+	if(v1>0x79&&v2>0x79&&realresult<0x80){   //v1(neg)+v2(neg)=pos
+		Status->OV=1;
 	}
 	return realresult;
 }
@@ -145,7 +151,7 @@ void addwf(uint16_t code){
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
 	unsigned int decimalresult;
-	char realresult;
+	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
 	realresult=rawAdd(v1,v2);
@@ -157,7 +163,7 @@ void subwf(uint16_t code){
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
 	unsigned int decimalresult;
-	char realresult;
+	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
 	realresult=rawAdd(v1,-v2);
@@ -192,6 +198,7 @@ void clrf(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int address=code&0x00FF;
 	storeFileReg(1,a,0x00,address);
+	Status->Z=1;
 	ADD_PC(1);
 	}
 void btfss(uint16_t code){
@@ -232,7 +239,7 @@ void addwfc(uint16_t code){
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
 	unsigned int decimalresult;
-	char realresult;
+	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
 	realresult=rawAdd(v1,v2+(Status->C--));
@@ -244,7 +251,7 @@ void andwf(uint16_t code){
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
 	unsigned int result;
-	char realresult;
+	uint8_t realresult;
 	uint8_t *FileRegister;
 
 	int v1=GetValue(a,address);
@@ -253,7 +260,7 @@ void andwf(uint16_t code){
 	realresult=result&0xFF;
 
 	storeFileReg(d,a,realresult,address);
-	if(realresult<0){
+	if(realresult>0x79){
 		Status->N=1;
 	}
 	if(realresult==0){

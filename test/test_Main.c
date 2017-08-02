@@ -56,17 +56,74 @@ void test_GetValue_expect_0x11from0x444(void){
 	memory[0x444]=0x11;
 	memory[0x44]=0x22;
 	*BSR=4;
-	int x=GetValue(1,0x44);
-	TEST_ASSERT_EQUAL_HEX16(x,0x11);
+	int result=GetValue(1,0x44);
+	TEST_ASSERT_EQUAL_HEX16(result,0x11);
 }
-void test_rawAdd_0x11_0x11_expect_0x22(void){
-	int v1=0x11;
-	int v2=0x11;
+void test_rawAdd_0x0F_0x1_expect_DC1_0x10(void){
+	int v1=0x0F;
+	int v2=0x1;
+	ClrStatus();
 	unsigned int result=rawAdd(v1,v2);
-	TEST_ASSERT_EQUAL_HEX16(result,0x22);
+	TEST_ASSERT_EQUAL_HEX16(Status->DC,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0x10);
 }
-
-
+void test_rawAdd_0xFF_0x1_expect_DC1_C1_0x1(void){
+	int v1=0xFF;
+	int v2=0x1;
+	ClrStatus();
+	char result=rawAdd(v1,v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->DC,1);
+	TEST_ASSERT_EQUAL_HEX16(Status->C,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0x0);
+}
+void test_rawAdd_0x1_minus0x1_expect_DC0_Z1_0x0(void){
+	int v1=0x1;
+	int v2=0x1;
+	ClrStatus();
+	char result=rawAdd(v1,-v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->Z,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0x0);
+}
+void test_rawAdd_0x0_minus0x1_expect_N1_0xFF(void){
+	int v1=0x0;
+	int v2=0x1;
+	ClrStatus();
+	uint8_t result=rawAdd(v1,-v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->N,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0xFF);
+}
+void test_rawAdd_0x40_0x40_expect_OV1_0x80(void){
+	int v1=0x40;     //2 positive num get neg num
+	int v2=0x40;
+	ClrStatus();
+	uint8_t result=rawAdd(v1,v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->OV,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0x80);
+}
+void test_rawAdd_0x7_0x6_expect_OV1_0x80(void){
+	int v1=0x81;     //2 neg number get positive num
+	int v2=0x7F;
+	ClrStatus();
+	uint8_t result=rawAdd(v1,-v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->OV,1);
+	TEST_ASSERT_EQUAL_HEX16(result,0x02);
+}
+void test_rawAdd_neg0x3_0x6_expect_OV0_0x03(void){
+	int v1=0x6;     //2 neg number get positive num
+	int v2=-(0x3);
+	ClrStatus();
+	uint8_t result=rawAdd(v1,v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->OV,0);
+	TEST_ASSERT_EQUAL_HEX16(result,0x03);
+}
+void test_rawAdd_0x3_neg0x6_expect_OV0_neg3(void){
+	int v1=-(0x6);     //2 neg number get positive num
+	int v2=0x3;
+	ClrStatus();
+	uint8_t result=rawAdd(v1,v2);
+	TEST_ASSERT_EQUAL_HEX16(Status->OV,0);
+	TEST_ASSERT_EQUAL_HEX16(result,0xFD);
+}
 
 ///////////////////////////////////////////////////////////
 void test_movlb_expect_BSR_is_0x05(void){
@@ -84,6 +141,7 @@ void test_movwf_expect(void){
 		0x0F99, 0x6E9E};        //movlw 0x99, movwf 0x9E,ACCESS
 	uint32_t *ptr=code;
 	//a=0,no BSR
+	ClrStatus();
 	movlw(*(ptr));
 	movwf(*(ptr+1));
 	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
@@ -93,6 +151,7 @@ void test_addwf_expect_0x10_C_0_DC_1(void){
 	uint32_t code[]={0x2212};
 	*WREG=0x0F;
 	memory[0x12]=0x01;
+	ClrStatus();
 	addwf(*code);
 	TEST_ASSERT_EQUAL(Status->C,0);
 	TEST_ASSERT_EQUAL(Status->DC,1);
