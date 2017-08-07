@@ -35,10 +35,6 @@ struct StatusReg{
 
 
 
-
-  unsigned int Skip;
-
-
 //get value
 void SET_PC(int newAddr);
 void CLEAR_PC();
@@ -52,6 +48,7 @@ void storeFileReg(int d,int a,uint8_t value,uint8_t address);
 char rawAdd(uint16_t v1,uint16_t v2);
 void rawBitTestSkip(int x,uint16_t code);
 void ClrStatus();
+void SetZnN(uint8_t result);
 //functions
 void movlw(uint16_t code);
 void movwf(uint16_t code);
@@ -74,6 +71,9 @@ void bov(uint16_t code);
 void bnov(uint16_t code);
 void addwfc(uint16_t code);
 void andwf(uint16_t code);
+void comf(uint16_t code);
+void iorwf(uint16_t code);
+
 //display
 
 void ShowWREG();

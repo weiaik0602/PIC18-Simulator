@@ -106,26 +106,23 @@ void rawBitTestSkip(int x,uint16_t code){
 		unsigned int a=GetA(code);
 		unsigned int b=GetB(code);
 		unsigned int address=code&0x00FF;
-		uint8_t *FileRegister;
-		if(a==0){
-			FileRegister=&memory[address];
-			unsigned int bit=(*FileRegister>>b)&0x01;
-			if(bit==x){
-				ADD_PC(2);
-				}
-			}
-		else{
-			address=ChangeAddressWithBSR(address);
-			FileRegister=&memory[address];
-			unsigned int bit=(*FileRegister>>b)&0x01;
-			if(bit==x){
+		uint8_t value=GetValue(a,address);
+		unsigned int bit=(value>>b)&0x01;
+		if(bit==x)
 			ADD_PC(2);
-			}
-	ADD_PC(1);
-	}
+		else
+			ADD_PC(1);
 }
 void ClrStatus(){
 	memory[0xFD8]=0;
+}
+void SetZnN(uint8_t value){
+	if(value>0x79){
+		Status->N=1;
+	}
+	if(value==0){
+		Status->Z=1;
+	}
 }
 /////////////////////////////////////////////////////////////////////////////
 //functions
@@ -260,13 +257,27 @@ void andwf(uint16_t code){
 	realresult=result&0xFF;
 
 	storeFileReg(d,a,realresult,address);
-	if(realresult>0x79){
-		Status->N=1;
-	}
-	if(realresult==0){
-		Status->Z=1;
-	}
-
+	SetZnN(realresult);
+	ADD_PC(1);
+}
+void comf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=code&0x00FF;
+	uint8_t value=GetValue(a,address);
+	value=~value;
+	storeFileReg(d,a,value,address);
+	SetZnN(value);
+	ADD_PC(1);
+}
+void iorwf(uint16_t code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=code&0x00FF;
+	uint8_t value=GetValue(a,address);
+	value=value|*WREG;
+	storeFileReg(d,a,value,address);
+	SetZnN(value);
 	ADD_PC(1);
 }
 
