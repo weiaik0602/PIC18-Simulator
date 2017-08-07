@@ -25,6 +25,7 @@ extern uint8_t memory[];
 
 
 typedef struct StatusReg StatusReg;
+typedef struct Simulator Simulator;
 struct StatusReg{
   uint8_t C:1;
   uint8_t DC:1;
@@ -32,13 +33,15 @@ struct StatusReg{
   uint8_t OV:1;
   uint8_t N:1;
 };
+struct Simulator{
+  char* (*execute)(uint16_t *code);    // a function
+};
 
-
-
+void Simulate(int numOfLine,...);
 //get value
 void SET_PC(int newAddr);
 void CLEAR_PC();
-unsigned int GetA(uint16_t *code);
+unsigned int GetA(uint8_t* code);
 unsigned int GetD(uint16_t *code);
 unsigned int GetB(uint16_t *code);
 unsigned int ChangeAddressWithBSR(unsigned int address);
@@ -50,8 +53,8 @@ void rawBitTestSkip(int x,uint16_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
 //functions
-void movlw(uint16_t *code);
-void movwf(uint16_t *code);
+void movlw(uint8_t *code);
+void movwf(uint8_t *code);
 void addwf(uint16_t *code);
 void movlb(uint16_t *code);
 void subwf(uint16_t *code);
@@ -62,7 +65,7 @@ void clrf(uint16_t *code);
 void btfss(uint16_t *code);
 void btfsc(uint16_t *code);
 void nop(uint16_t *code);
-void movff(uint32_t *code);
+void movff(uint16_t *code,uint16_t *code1);
 void bc(uint16_t *code);
 void bnc(uint16_t *code);
 void bnz(uint16_t *code);
