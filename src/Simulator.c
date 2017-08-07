@@ -75,31 +75,40 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint16_t code){
 		else
 		ADD_PC(1);
 }
-char rawAdd(uint16_t v1,uint16_t v2){
+char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable){
 	uint16_t result;
 	uint8_t realresult;
-	uint8_t decimalresult;
-	result= (v1)+(v2);
+	uint16_t decimalresult;
+	if(CarryEnable==1){
+		result= (v1)+(v2)+CarryEnable;
+		decimalresult=(v1&0xF)+(v2&0xF)+CarryEnable;
+	}
+	else{
+		result= (v1)+(v2);
+		decimalresult=(v1&0xF)+(v2&0xF);
+	}
 	realresult=result&0xFF;
-	decimalresult=(v1&0xF)+(v2&0xF);
-	if(result>0xFF){
-		Status->C=1;
-	}
-	if(decimalresult>0xF){
+	if(decimalresult>0xF)
 		Status->DC=1;
-	}
-	if(realresult==0){
+	else
+		Status->DC=0;
+	if(result>0xFF)
+		Status->C=1;
+	else
+		Status->C=0;
+	if(realresult==0)
 		Status->Z=1;
-	}
-	if(realresult>0x79){   //0x80 to 0xFF is negative num
+	else
+		Status->Z=0;
+	if(realresult>0x79)   //0x80 to 0xFF is negative num
 		Status->N=1;
-	}
-	if(v1<0x80&&v2<0x80&&realresult>0x79){   //v1(pos)+v2(pos)=neg
+	else
+		Status->N=0;
+	Status->OV=0;
+	if(v1<0x80&&v2<0x80&&realresult>0x79)   //v1(pos)+v2(pos)=neg
 		Status->OV=1;
-	}
-	if(v1>0x79&&v2>0x79&&realresult<0x80){   //v1(neg)+v2(neg)=pos
+	if(v1>0x79&&v2>0x79&&realresult<0x80)   //v1(neg)+v2(neg)=pos
 		Status->OV=1;
-	}
 	return realresult;
 }
 void rawBitTestSkip(int x,uint16_t code){
@@ -117,12 +126,15 @@ void ClrStatus(){
 	memory[0xFD8]=0;
 }
 void SetZnN(uint8_t value){
-	if(value>0x79){
+	if(value>0x79)
 		Status->N=1;
-	}
-	if(value==0){
+	else
+		Status->N=0;
+	if(value==0)
 		Status->Z=1;
-	}
+	else
+		Status->Z=0;
+
 }
 /////////////////////////////////////////////////////////////////////////////
 //functions
@@ -147,11 +159,10 @@ void addwf(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
-	unsigned int decimalresult;
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
-	realresult=rawAdd(v1,v2);
+	realresult=rawAdd(v1,v2,0);
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
@@ -159,11 +170,10 @@ void subwf(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
-	unsigned int decimalresult;
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
-	realresult=rawAdd(v1,-v2);
+	realresult=rawAdd(v1,-v2,0);
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
@@ -235,11 +245,10 @@ void addwfc(uint16_t code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=code&0x00FF;
-	unsigned int decimalresult;
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
-	realresult=rawAdd(v1,v2+(Status->C--));
+	realresult=rawAdd(v1,v2,1);
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
