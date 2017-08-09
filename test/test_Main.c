@@ -11,16 +11,16 @@ void tearDown(void){}
 
 void test_GetA_expect_get1(void){
 	uint8_t code[]={0x01,0x00};
-	int result=GetA(code+1);
+	int result=GetA(code);
 	TEST_ASSERT_EQUAL(result,1);
 }
 void test_GetD_expect_get1(void){
-	uint16_t code[]={0x0200};
+	uint8_t code[]={0x02,0x00};
 	int result=GetD(code);
 	TEST_ASSERT_EQUAL(result,1);
 }
 void test_GetB_expect_get7(void){
-	uint16_t code[]={0xFF00};
+	uint8_t code[]={0xFF,0x00};
 	int result=GetB(code);
 	TEST_ASSERT_EQUAL(result,7);
 }
@@ -152,28 +152,28 @@ void test_SetZnN_expect_Z0_N1(void){
 
 ///////////////////////////////////////////////////////////
 void test_movlb_expect_BSR_is_0x05(void){
-	uint16_t code[]={0x0105};
+	uint8_t code[]={0x01,0x05};
 	movlb(code);
 	TEST_ASSERT_EQUAL(*BSR,0x5);
 }
 void test_movlw_expect_wreg_is_0x88(void){
-	uint8_t code[]={0x0F,88};
-	movlw(code+1);
-	TEST_ASSERT_EQUAL(*WREG,0x88);
+	uint8_t code[]={0x0F,0x88};
+	movlw(code);
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x88);
 }
 void test_movwf_expect(void){
-	uint16_t code[]={
-		0x0F99,							//movlw 0x99
-	  0x6E9E};           //movwf 0x9E,ACCESS
+	uint8_t code[]={
+		0x0F, 0x99,							//movlw 0x99
+	  0x6E, 0x9E};           //movwf 0x9E,ACCESS
 	//a=0,no BSR
 	ClrStatus();
 	movlw(code);
-	movwf(code+1);
+	movwf(code+2);
 	TEST_ASSERT_EQUAL(*WREG,0x99);    //expect WREG with the value 0x99
 	TEST_ASSERT_EQUAL(memory[0x9E],0x99); //expect memory 0x9E with the value 0x99
-}/*
+}
 void test_addwf_expect_0x10_C_0_DC_1(void){
-	uint16_t code[]={0x2212};
+	uint8_t code[]={0x22, 0x12};
 	*WREG=0x0F;
 	memory[0x12]=0x01;
 	ClrStatus();
@@ -183,7 +183,7 @@ void test_addwf_expect_0x10_C_0_DC_1(void){
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x10);
 }
 void test_subwf_0x11minus0x22_expect_0xEF_N_1(void){
-	uint16_t code[]={0x2212};
+	uint8_t code[]={0x22,0x12};
 	*WREG=0x22;
 	memory[0x12]=0x11;
 	subwf(code);
@@ -191,37 +191,39 @@ void test_subwf_0x11minus0x22_expect_0xEF_N_1(void){
 	TEST_ASSERT_EQUAL(Status->N,1);
 }
 void test_bcf_expect_0xBF(void){
-	uint16_t code[]={0x9C11};
+	uint8_t code[]={0x9C,0x11};
   memory[0x11]=0xFF;
 	bcf(code);      //clear the 6th bit of the memory ox11
 	TEST_ASSERT_EQUAL_HEX16(memory[0x11],0xBF);   //memory 0x11 now expected 0xBF(1111 1111 -> 1011 1111)
 }
 void test_bsf_expect_0x40(void){
-	uint16_t code[]={0x8C11};
+	uint8_t code[]={0x8C,0x11};
   memory[0x11]=0x00;
 	bsf(code);      //set the 6th bit of the memory ox11
 	TEST_ASSERT_EQUAL_HEX16(memory[0x11],0x40);   //memory 0x11 now expected 0x40(0000 0000  -> 0100 0000)
 }
 void test_setf_expect_0xFF(void){
-	uint16_t code[]={0x6814};
+	uint8_t code[]={0x68,0x14};
   memory[0x14]=0x89;
   setf(code);     //memory 0x14 expected 0xFF
 	TEST_ASSERT_EQUAL_HEX16(memory[0x14],0xFF);
 }
 void test_clrf_expect_0x00(void){
-	uint16_t code[]={0x0014};
+	uint8_t code[]={0x00,0x14};
   memory[0x14]=0x89;
   clrf(code);     //memory 0x14 expected 0x00
 	TEST_ASSERT_EQUAL_HEX16(memory[0x14],0x00);
 }
 void test_movff_expect_0x44_moved_to_0x88(void){
-	uint16_t code[]={0xC055,0xF088};
+	uint8_t code[]={0xC0,0x55,
+									0xF0,0x88};
 	memory[0x55]=0x44;
-  movff(code,code+1);
+  movff(code);
   TEST_ASSERT_EQUAL_HEX16(memory[0x88],0x44);
 }
 void test_btfss_expect_skip(void){
-	uint16_t code[]={0x0E88,0x00EE};
+	uint8_t code[]={0x0E,0x88,
+									0x00,0xEE};
   memory[0x88]=0x80;
 	CLEAR_PC();
 	*WREG=0x80;
@@ -231,25 +233,29 @@ void test_btfss_expect_skip(void){
 
 }
 void test_btfsc_expect_skip(void){
-	uint16_t code[]={0x0A88,0x00EE};
+	uint8_t code[]={0x0A,0x88,
+									0x00,0xEE};
   memory[0x88]=0xDF;    //memory 0x88 with the value 0xDF(1101 1111)
 	*WREG=0x80;
 	CLEAR_PC();
   btfsc(code);   //test the 5th bit in the memory 0x88,skip if it is 0
-	movlw(code+1);
+	movlw(code+2);
   TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x6) ;//WREG expected 0x80 as we skip the movlw instruction
 }
 void test_bc_expect_PC_0x08(void){
-	uint16_t code[]={0x0055,0x0000,0x0001};
+	uint8_t code[]={0x00,0x55,
+									0x00,0x00,
+									0x00,0x01};
 	CLEAR_PC();
 	Status->C=1;
 	movlw(code);
-	nop(code+1);
-	bc(code+2);
+	nop(code+2);
+	bc(code+4);
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
 }
 void test_bnc_expect_PC_0x00(void){
-	uint16_t code[]={0x0055,0x0000,0x00FE};
+	uint8_t code[]={0x00,0x55,
+									0x00,0xFE};
 	CLEAR_PC();
 	Status->C=0;
 	movlw(code);
@@ -257,16 +263,19 @@ void test_bnc_expect_PC_0x00(void){
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
 }
 void test_bz_expect_PC_0x08(void){
-	uint16_t code[]={0x0055,0x0000,0x0001};
+	uint8_t code[]={0x00,0x55,
+									0x00,0x00,
+									0x00,0x01};
 	CLEAR_PC();
 	Status->Z=1;
 	movlw(code);
-	nop(code+1);
-	bz(code+2);
+	nop(code+2);
+	bz(code+4);
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
 }
 void test_bnz_expect_PC_0x00(void){
-	uint16_t code[]={0x0055,0x0000,0x00FE};
+	uint8_t code[]={0x00,0x55,
+									0x00,0xFE};
 	CLEAR_PC();
 	Status->Z=0;
 	movlw(code);
@@ -274,16 +283,19 @@ void test_bnz_expect_PC_0x00(void){
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
 }
 void test_bov_expect_PC_0x08(void){
-	uint16_t code[]={0x0055,0x0000,0x0001};
+	uint8_t code[]={0x00,0x55,
+									0x00,0x00,
+									0x00,0x01};
 	CLEAR_PC();
 	Status->OV=1;
 	movlw(code);
-	nop(code+1);
-	bov(code+2);
+	nop(code+2);
+	bov(code+4);
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x08);
 }
 void test_bnov_expect_PC_0x00(void){
-	uint16_t code[]={0x0055,0x0000,0x00FE};
+	uint8_t code[]={0x00,0x55,
+									0x00,0xFE};
 	CLEAR_PC();
 	Status->OV=0;
 	movlw(code);
@@ -291,7 +303,7 @@ void test_bnov_expect_PC_0x00(void){
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x00);
 }
 void test_addwfc_expect_0x11_C_0_DC_1(void){
-	uint16_t code[]={0x2212};
+	uint8_t code[]={0x22,0x12};
 	ClrStatus();
 	*WREG=0x0F;
 	Status->C=1;
@@ -303,7 +315,7 @@ void test_addwfc_expect_0x11_C_0_DC_1(void){
 }
 void test_andwf_0xFF_and_0xFF_expect_0xFF_Z0_N1(void){
 	ClrStatus();
-	uint16_t code[]={0x0212};
+	uint8_t code[]={0x02,0x12};
 	*WREG=0xFF;
 	memory[0x12]=0xFF;
 	andwf(code);
@@ -313,7 +325,7 @@ void test_andwf_0xFF_and_0xFF_expect_0xFF_Z0_N1(void){
 }
 void test_andwf_0xFF_and_0x00_expect_0x00_Z1_N0(void){
 	ClrStatus();
-	uint16_t code[]={0x0212};
+	uint8_t code[]={0x02,0x12};
 	*WREG=0x00;
 	memory[0x12]=0xFF;
 	andwf(code);
@@ -322,26 +334,38 @@ void test_andwf_0xFF_and_0x00_expect_0x00_Z1_N0(void){
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
 }
 void test_comf_0x80_expect_0x7F(void){
-	uint16_t code[]={0x1212};
+	uint8_t code[]={0x12,0x12};
 	memory[0x12]=0x80;
 	comf(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x7F);
 }
 void test_iorwf_0x13_0x91_expect_0x93(void){
-		uint16_t code[]={0x1288};
+		uint8_t code[]={0x12,0x88};
 		memory[0x88]=0x13;
 		*WREG=0x91;
 		iorwf(code);
 		TEST_ASSERT_EQUAL_HEX16(memory[0x88],0x93);
-}/*
-void test_Simulate(void){
-	uint16_t code[]={0x2612,0x2612};
-	*WREG=0x0F;
-	memory[0x12]=0x01;
-	ClrStatus();
-	Simulate(2,code,code+1);
-	TEST_ASSERT_EQUAL(Status->C,0);
-	TEST_ASSERT_EQUAL(Status->DC,1);
-	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x10);
 }
-*/
+void test_Simulate(void){
+	uint8_t code[]={0x0E,0x11,     //movlw 0x11
+									0x6E,0x56,   //movwf 0x56
+									0xA8,0x56,   //btfss 0x56
+									0xC0,0xFF,   //movff 0xFF,0x12;
+									0xF0,0x12};
+	CLEAR_PC();
+	ClrStatus();
+	memory[0xFF]=0x14;
+	memory[0x12]=0;
+	//1st instruction line movlw 0x12
+	Simulate(code+GET_PC());
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x11);
+	//2nd instruction line movwf 0x56
+	Simulate(code+GET_PC());
+	TEST_ASSERT_EQUAL_HEX16(memory[0x56],0x11);
+	//3rd instruction line btfsc 0x56
+	Simulate(code+GET_PC());
+	//4th intruction line movff 0xFF,0x12(should be skipped)
+	Simulate(code+GET_PC());
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
+
+}

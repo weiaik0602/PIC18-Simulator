@@ -5,7 +5,7 @@
 
 uint8_t memory[32*KB];
 
-/*
+
 Simulator OpcodeTable[256]={
 	//[0x00]={zero},
   [0x24]={addwf},
@@ -22,7 +22,7 @@ Simulator OpcodeTable[256]={
   [0x17]={andwf},
   [0x6B]={clrf},
   [0x6A]={clrf},
-  [0x1C]={comf},
+/*  [0x1C]={comf},
   [0x1D]={comf},
   [0x1E]={comf},
   [0x1F]={comf},
@@ -55,18 +55,18 @@ Simulator OpcodeTable[256]={
   [0x48]={infsnz},
   [0x49]={infsnz},
   [0x4A]={infsnz},
-  [0x4B]={infsnz},
+  [0x4B]={infsnz},*/
   [0x10]={iorwf},
   [0x11]={iorwf},
   [0x12]={iorwf},
   [0x13]={iorwf},
-  [0x50]={movf},
+/*  [0x50]={movf},
   [0x51]={movf},
   [0x52]={movf},
-  [0x53]={movf},
+  [0x53]={movf},*/
   [0x6E]={movwf},
   [0x6F]={movwf},
-  [0x02]={mulwf},
+/*  [0x02]={mulwf},
   [0x03]={mulwf},
   [0x6C]={negf},
   [0x6D]={negf},
@@ -85,17 +85,17 @@ Simulator OpcodeTable[256]={
   [0x40]={rrncf},
   [0x41]={rrncf},
   [0x42]={rrncf},
-  [0x43]={rrncf},
+  [0x43]={rrncf},*/
   [0x68]={setf},
   [0x69]={setf},
-  [0x54]={subfwb},
+/*  [0x54]={subfwb},
   [0x55]={subfwb},
   [0x56]={subfwb},
-  [0x57]={subfwb},
+  [0x57]={subfwb},*/
   [0x5C]={subwf},
   [0x5D]={subwf},
   [0x5E]={subwf},
-  [0x5F]={subwf},
+  [0x5F]={subwf},/*
   [0x58]={subwfb},
   [0x59]={subwfb},
   [0x5A]={subwfb},
@@ -109,7 +109,7 @@ Simulator OpcodeTable[256]={
   [0x18]={xorwf},
   [0x19]={xorwf},
   [0x1A]={xorwf},
-  [0x1B]={xorwf},
+  [0x1B]={xorwf},*/
   [0x90]={bcf},
   [0x91]={bcf},
   [0x92]={bcf},
@@ -173,7 +173,7 @@ Simulator OpcodeTable[256]={
   [0xAC]={btfss},
   [0xAD]={btfss},
   [0xAE]={btfss},
-  [0xAF]={btfss},
+  [0xAF]={btfss},/*
   [0x70]={btg},
   [0x71]={btg},
   [0x72]={btg},
@@ -189,12 +189,12 @@ Simulator OpcodeTable[256]={
   [0x7C]={btg},
   [0x7D]={btg},
   [0x7E]={btg},
-  [0x7F]={btg},
+  [0x7F]={btg},*/
   [0xE1]={bnz},
   [0xE2]={bc},
   [0xE3]={bnc},
   [0xE4]={bov},
-  [0xE5]={bnov},
+  [0xE5]={bnov},/*
   [0xE6]={bn},
   [0xE7]={bnn},
   [0x08]={sublw},
@@ -203,24 +203,25 @@ Simulator OpcodeTable[256]={
   [0x0B]={andlw},
   [0x0C]={retlw},
   [0x0D]={mullw},
-  [0x0E]={movlw},
+
   [0x0F]={addlw},
-  [0x01]={movlb},
-  [0xF0]={nop1},
-  [0xF1]={nop1},
-  [0xF2]={nop1},
-  [0xF3]={nop1},
-  [0xF4]={nop1},
-  [0xF5]={nop1},
-  [0xF6]={nop1},
-  [0xF7]={nop1},
-  [0xF8]={nop1},
-  [0xF9]={nop1},
-  [0xFA]={nop1},
-  [0xFC]={nop1},
-  [0xFD]={nop1},
-  [0xFE]={nop1},
-  [0xFF]={nop1},
+  [0x01]={movlb},*/
+	 [0x0E]={movlw},
+  [0xF0]={nop},
+  [0xF1]={nop},
+  [0xF2]={nop},
+  [0xF3]={nop},
+  [0xF4]={nop},
+  [0xF5]={nop},
+  [0xF6]={nop},
+  [0xF7]={nop},
+  [0xF8]={nop},
+  [0xF9]={nop},
+  [0xFA]={nop},
+  [0xFC]={nop},
+  [0xFD]={nop},
+  [0xFE]={nop},
+  [0xFF]={nop},/*
   [0xEC]={call},
   [0xED]={call},
   [0xEF]={goto1},
@@ -232,7 +233,7 @@ Simulator OpcodeTable[256]={
   [0xDC]={rcall},
   [0xDD]={rcall},
   [0xDE]={rcall},
-  [0xDF]={rcall},
+  [0xDF]={rcall},*/
   [0xC0]={movff},
   [0xC1]={movff},
   [0xC2]={movff},
@@ -249,44 +250,25 @@ Simulator OpcodeTable[256]={
   [0xCD]={movff},
   [0xCE]={movff},
   [0xCF]={movff},
+};
 
-
-void Simulate(int numOfLine,...){
-	va_list args;
-	va_start(args,numOfLine);
-
-
-	while(numOfLine--){
-		uint8_t *code=va_arg(args,uint16_t *);
-		uint8_t opcode=(*code)>>8;
-		OpcodeTable[opcode].execute(code);
-	}
+void Simulate(uint8_t *opcode){
+		uint8_t code=*opcode;
+		OpcodeTable[code].execute(opcode);
 }
 
 
-int add(int numOfItems, ...) {
-  va_list args;
-  int sum = 0, val;
-  va_start(args, numOfItems);
-
-  while(numOfItems--) {
-    val = va_arg(args, int);
-    printf("val: %d\n", val);
-    sum += val;
-  }
-  return sum;
-}*/
 /////////////////////////////////////////////////////////////////////////////
 //get value
 
 unsigned int GetA(uint8_t* code){
-	return 0x01&(*(code-1));
+	return 0x01&(*code);
 }
-unsigned int GetD(uint16_t *code){
-	return 0x01&(*code>>9);
+unsigned int GetD(uint8_t *code){
+	return 0x01&(*code>>1);
 }
-unsigned int GetB(uint16_t *code){
-	return (*code>>9)&0x0007;
+unsigned int GetB(uint8_t *code){
+	return (*code>>1)&0x0007;
 }
 unsigned int ChangeAddressWithBSR(unsigned int address){
 	unsigned int vBSR=*BSR;
@@ -329,20 +311,6 @@ int GetValue(int a,unsigned int address){
 		newaddress=ChangeAddressWithBSR(address);
 		return memory[newaddress];
 	}
-}
-void rawCondBranch(int CondBit,int ExpectedBit,uint16_t *code){
-		unsigned int Bit=(memory[0xFD8]>>CondBit)&0x01;
-    if(Bit==ExpectedBit){
-      char step=*code&0xFF;
-      if(step<0){
-        step=~(step);
-        ADD_PC(-step);
-      }
-      else
-      ADD_PC(step+1);
-    }
-		else
-		ADD_PC(1);
 }
 char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable){
 	uint16_t result;
@@ -394,10 +362,10 @@ void SetZnN(uint8_t value){
 		Status->Z=0;
 
 }
-void rawBitTestSkip(int x,uint16_t *code){
+void rawBitTestSkip(int x,uint8_t *code){
 		unsigned int a=GetA(code);
 		unsigned int b=GetB(code);
-		unsigned int address=*code&0x00FF;
+		unsigned int address=*(code+1);
 		uint8_t value=GetValue(a,address);
 		unsigned int bit=(value>>b)&0x01;
 		if(bit==x)
@@ -405,30 +373,41 @@ void rawBitTestSkip(int x,uint16_t *code){
 		else
 			ADD_PC(1);
 }
-
+void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code){
+		unsigned int Bit=(memory[0xFD8]>>CondBit)&0x01;
+    if(Bit==ExpectedBit){
+      char step=*(code+1);
+      if(step<0){
+        step=~(step);
+        ADD_PC(-step);
+      }
+      else
+      ADD_PC(step+1);
+    }
+		else
+		ADD_PC(1);
+}
 /////////////////////////////////////////////////////////////////////////////
 //functions
 
-void movlb(uint16_t *code){
-	*BSR=*code&0x000F;
+void movlb(uint8_t *code){
+	*BSR=*(code+1)&0xF;
 	ADD_PC(1);
 }
 void movlw(uint8_t *code){
-  unsigned short data;
-  data=*code;
-  *WREG=data;
+  *WREG=*(code+1);
 	ADD_PC(1);
 }
 void movwf(uint8_t *code){
 	unsigned int a=GetA(code);
-	unsigned int address=code[0];
+	unsigned int address=*(code+1);
 	storeFileReg(1,a,*WREG,address);
 	ADD_PC(1);
-}/*
-void addwf(uint16_t *code){
+}
+void addwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
@@ -436,10 +415,10 @@ void addwf(uint16_t *code){
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
-void subwf(uint16_t *code){
+void subwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
@@ -447,74 +426,74 @@ void subwf(uint16_t *code){
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
-void bcf(uint16_t *code){
+void bcf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int b=GetB(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t reset=~(0x01<<b);
 	int v1=GetValue(a,address);
 	storeFileReg(1,a,(v1&reset),address);
 	ADD_PC(1);
 }
-void bsf(uint16_t *code){
+void bsf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int b=GetB(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t reset=(0x01<<b);
 	int v1=GetValue(a,address);
 	storeFileReg(1,a,(v1|reset),address);
 	ADD_PC(1);
 }
-void setf(uint16_t *code){
+void setf(uint8_t *code){
 	unsigned int a=GetA(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	storeFileReg(1,a,0xFF,address);
 	ADD_PC(1);
 }
-void clrf(uint16_t *code){
+void clrf(uint8_t *code){
 	unsigned int a=GetA(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	storeFileReg(1,a,0x00,address);
 	Status->Z=1;
 	ADD_PC(1);
-	}
-void btfss(uint16_t *code){
+}
+void btfss(uint8_t *code){
 	rawBitTestSkip(1,code);
 }
-void btfsc(uint16_t *code){
+void btfsc(uint8_t *code){
 	rawBitTestSkip(0,code);
 }
-void nop(uint16_t *code){
+void nop(uint8_t *code){
 	ADD_PC(1);
 }
-void movff(uint16_t *code,uint16_t *code1){
-	unsigned int source=(*code)&0xFFF;
-	unsigned int destination=(*code1)&0xFFF;
+void movff(uint8_t *code){
+	unsigned int source=(*(code)&0xF)<<8|*(code+1);
+	unsigned int destination=(*(code+2)&0xF)<<8|*(code+3);
 	memory[destination]=memory[source];
 	ADD_PC(2);
 }
-void bc(uint16_t *code){
+void bc(uint8_t *code){
   rawCondBranch(C_Bit,1,code);
 }
-void bnc(uint16_t *code){
+void bnc(uint8_t *code){
 	rawCondBranch(C_Bit,0,code);
 }
-void bz(uint16_t *code){
+void bz(uint8_t *code){
 	rawCondBranch(Z_Bit,1,code);
 }
-void bnz(uint16_t *code){
+void bnz(uint8_t *code){
 	rawCondBranch(Z_Bit,0,code);
 }
-void bov(uint16_t *code){
+void bov(uint8_t *code){
 	rawCondBranch(OV_Bit,1,code);
 }
-void bnov(uint16_t *code){
+void bnov(uint8_t *code){
 		rawCondBranch(OV_Bit,0,code);
 }
-void addwfc(uint16_t *code){
+void addwfc(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t realresult;
 	int v1=GetValue(a,address);
 	int v2=*WREG;
@@ -522,10 +501,10 @@ void addwfc(uint16_t *code){
 	storeFileReg(d,a,realresult,address);
 	ADD_PC(1);
 }
-void andwf(uint16_t *code){
+void andwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	unsigned int result;
 	uint8_t realresult;
 	uint8_t *FileRegister;
@@ -539,20 +518,20 @@ void andwf(uint16_t *code){
 	SetZnN(realresult);
 	ADD_PC(1);
 }
-void comf(uint16_t *code){
+void comf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t value=GetValue(a,address);
 	value=~value;
 	storeFileReg(d,a,value,address);
 	SetZnN(value);
 	ADD_PC(1);
 }
-void iorwf(uint16_t *code){
+void iorwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
-	unsigned int address=*code&0x00FF;
+	unsigned int address=*(code+1);
 	uint8_t value=GetValue(a,address);
 	value=value|*WREG;
 	storeFileReg(d,a,value,address);

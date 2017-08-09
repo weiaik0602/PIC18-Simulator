@@ -34,48 +34,51 @@ struct StatusReg{
   uint8_t N:1;
 };
 struct Simulator{
-  char* (*execute)(uint16_t *code);    // a function
+  void (*execute)(uint8_t *code);    // a function
 };
 
-void Simulate(int numOfLine,...);
+void Simulate(uint8_t *opcode);
+
+
+
 //get value
 void SET_PC(int newAddr);
 void CLEAR_PC();
 unsigned int GetA(uint8_t* code);
-unsigned int GetD(uint16_t *code);
-unsigned int GetB(uint16_t *code);
+unsigned int GetD(uint8_t *code);
+unsigned int GetB(uint8_t *code);
 unsigned int ChangeAddressWithBSR(unsigned int address);
 int GetValue(int a,unsigned int address);
-void rawCondBranch(int CondBit,int ExpectedBit,uint16_t *code);
+void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code);
 void storeFileReg(int d,int a,uint8_t value,uint8_t address);
 char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable);
-void rawBitTestSkip(int x,uint16_t *code);
+void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
 //functions
+void movlb(uint8_t *code);
 void movlw(uint8_t *code);
 void movwf(uint8_t *code);
-void addwf(uint16_t *code);
-void movlb(uint16_t *code);
-void subwf(uint16_t *code);
-void bcf(uint16_t *code);
-void bsf(uint16_t *code);
-void setf(uint16_t *code);
-void clrf(uint16_t *code);
-void btfss(uint16_t *code);
-void btfsc(uint16_t *code);
-void nop(uint16_t *code);
-void movff(uint16_t *code,uint16_t *code1);
-void bc(uint16_t *code);
-void bnc(uint16_t *code);
-void bnz(uint16_t *code);
-void bz(uint16_t *code);
-void bov(uint16_t *code);
-void bnov(uint16_t *code);
-void addwfc(uint16_t *code);
-void andwf(uint16_t *code);
-void comf(uint16_t *code);
-void iorwf(uint16_t *code);
+void addwf(uint8_t *code);
+void subwf(uint8_t *code);
+void bcf(uint8_t *code);
+void bsf(uint8_t *code);
+void setf(uint8_t *code);
+void clrf(uint8_t *code);
+void btfss(uint8_t *code);
+void btfsc(uint8_t *code);
+void nop(uint8_t *code);
+void movff(uint8_t *code);
+void bc(uint8_t *code);
+void bnc(uint8_t *code);
+void bnz(uint8_t *code);
+void bz(uint8_t *code);
+void bov(uint8_t *code);
+void bnov(uint8_t *code);
+void addwfc(uint8_t *code);
+void andwf(uint8_t *code);
+void comf(uint8_t *code);
+void iorwf(uint8_t *code);
 
 //display
 
@@ -87,9 +90,5 @@ void ShowStatus();
 
 
 
-/*
-'body':
-  'ctrl-shift-s': 'window:save-all'
-*/
 
 #endif // _SIMULATOR_H
