@@ -9,11 +9,13 @@ uint8_t PCLATH;
 uint8_t PCLATU;
 
 #define KB 1024
+#define MB 1048576
 #define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
 #define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
 
 
 extern uint8_t memory[];
+extern uint8_t RAM[];
 #define Status    ((StatusReg*)&memory[0xFD8])
 #define WREG      (&memory[0xFE8])
 #define BSR       (&memory[0xFE0])
@@ -37,7 +39,7 @@ struct Simulator{
   void (*execute)(uint8_t *code);    // a function
 };
 
-void Simulate(uint8_t *opcode);
+void Simulate();
 
 
 

@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 uint8_t memory[32*KB];
-
+uint8_t RAM[2*MB];
 
 Simulator OpcodeTable[256]={
 	//[0x00]={zero},
@@ -252,9 +252,11 @@ Simulator OpcodeTable[256]={
   [0xCF]={movff},
 };
 
-void Simulate(uint8_t *opcode){
-		uint8_t code=*opcode;
-		OpcodeTable[code].execute(opcode);
+void Simulate(){
+    for(int i=0;i=4;i=GET_PC()){
+      uint8_t code=RAM[i];
+  		OpcodeTable[code].execute(&RAM[i]);
+    }
 }
 
 
