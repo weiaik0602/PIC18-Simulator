@@ -1,25 +1,27 @@
 #ifndef _SIMULATOR_H
 #define _SIMULATOR_H
-
 #include <stdint.h>
 
 
 uint8_t PCL;
 uint8_t PCLATH;
 uint8_t PCLATU;
+uint8_t TBLPTRL;
+uint8_t TBLPTRH;
+uint8_t TBLPTRU;
+extern uint8_t memory[];
+extern uint8_t FLASH[];
+extern uint8_t PM[];
 
 #define KB 1024
 #define MB 1048576
+#define GET_TABLEPOINTER()    (TBLPTRL|(TBLPTRH<<8)|(TBLPTRU<<16))
 #define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
 #define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
-
-
-extern uint8_t memory[];
-extern uint8_t RAM[];
 #define Status    ((StatusReg*)&memory[0xFD8])
 #define WREG      (&memory[0xFE8])
 #define BSR       (&memory[0xFE0])
-
+#define TABLAT    (&memory[0xFF5])
 #define C_Bit      0
 #define OV_Bit     3
 #define Z_Bit      2
@@ -39,11 +41,11 @@ struct Simulator{
   void (*execute)(uint8_t *code);    // a function
 };
 
+
+
+
 void Simulate(int size);
-
-
-
-//get value
+//////////change value/////
 void SET_PC(int newAddr);
 void CLEAR_PC();
 unsigned int GetA(uint8_t* code);
@@ -57,7 +59,7 @@ char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable);
 void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
-void zero();
+
 //functions
 void movlb(uint8_t *code);
 void movlw(uint8_t *code);
@@ -82,15 +84,6 @@ void addwfc(uint8_t *code);
 void andwf(uint8_t *code);
 void comf(uint8_t *code);
 void iorwf(uint8_t *code);
-
-//display
-
-void ShowWREG();
-void ShowBSR();
-void ShowMemory(unsigned address);
-void ShowPC();
-void ShowStatus();
-
 
 
 

@@ -4,10 +4,11 @@
 #include <stdarg.h>
 
 uint8_t memory[32*KB];
-uint8_t RAM[2*MB];
+uint8_t FLASH[2*KB];
+uint8_t PM[2*MB];
 
 Simulator OpcodeTable[256]={
-	[0x00]={zero},
+	[0x00]={check},
   [0x24]={addwf},
   [0x25]={addwf},
   [0x26]={addwf},
@@ -255,15 +256,26 @@ Simulator OpcodeTable[256]={
 void Simulate(int size){
   int i=0;
    while(i<size){
-     OpcodeTable[RAM[i]].execute(&RAM[i]);
+     OpcodeTable[FLASH[i]].execute(&FLASH[i]);
      i=GET_PC();
    }
 }
+void check(uint8_t* code){
+	uint8_t next_instruction=*(code+1);
+	switch(next_instruction){
+		case(0x08):tblrd();
+		case(0x09):tblrdpi();
+		case(0x0A):tblrdpd();
+		case(0x0B):tblrdi();
+		case(0x0C):tblwt();
+		case(0x0D):tblwtpi();
+		case(0x0E):tblwtpd();
+		case(0x0F):tblwtd();
+	}
+}
 
 
-/////////////////////////////////////////////////////////////////////////////
-//get value
-
+////////////////////change value////////////////////////////////////////////////////
 unsigned int GetA(uint8_t* code){
 	return 0x01&(*code);
 }
@@ -390,9 +402,7 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code){
 		else
 		ADD_PC(1);
 }
-void zero(){
-  int j=0;
-}
+
 /////////////////////////////////////////////////////////////////////////////
 //functions
 
@@ -544,28 +554,3 @@ void iorwf(uint8_t *code){
 	SetZnN(value);
 	ADD_PC(1);
 }
-/*
-///////////////////////////////////////////////////////////////////////////
-//display
-void ShowWREG(){
-	printf("the value of WREG now is %#04x\n",*WREG);
-}
-void ShowBSR(){
-	printf("the value of BSR now is %#04x\n",*BSR);
-}
-void ShowMemory(unsigned int address){
-	printf("the value of %#04x now is %#04x\n",address,memory[address]);
-}
-void ShowPC(){
-	printf("the value of PC now is %#04x\n",GET_PC());
-}
-void ShowC(){
-	printf("the value of C now is %d\n",Status->C);
-}
-void ShowN(){
-	printf("the value of N now is %d\n",Status->N);
-}
-void ShowStatus(){
-	printf("%#04x\n",*Status );
-}
-*/
