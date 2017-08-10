@@ -357,25 +357,16 @@ void test_Simulate(void){
 	ClrStatus();
 	memory[0xFF]=0x14;
 	memory[0x12]=0;
-	int x=sizeof(code);
-	//int y=sizeof(RAM);
+	int size=sizeof(code);
 	memcpy(RAM,code,sizeof(code));
-	//printf("the value of X now is %d\n",y);
-	printf("%#04x\n",RAM[9]);
-	//RAM=memory;
-	Simulate();
-
+	Simulate(size);
 
 	//1st instruction line movlw 0x12
-	//Simulate(code+GET_PC());
-	//TEST_ASSERT_EQUAL_HEX16(*WREG,0x11);
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x11);
 	//2nd instruction line movwf 0x56
-	//Simulate(code+GET_PC());
-	//TEST_ASSERT_EQUAL_HEX16(memory[0x56],0x11);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x56],0x11);
 	//3rd instruction line btfsc 0x56
-	//Simulate(code+GET_PC());
 	//4th intruction line movff 0xFF,0x12(should be skipped)
-	//Simulate();
-	//TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
 
 }

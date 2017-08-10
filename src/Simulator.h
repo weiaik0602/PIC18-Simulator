@@ -39,7 +39,7 @@ struct Simulator{
   void (*execute)(uint8_t *code);    // a function
 };
 
-void Simulate();
+void Simulate(int size);
 
 
 
@@ -57,6 +57,7 @@ char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable);
 void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
+void zero();
 //functions
 void movlb(uint8_t *code);
 void movlw(uint8_t *code);

@@ -7,7 +7,7 @@ uint8_t memory[32*KB];
 uint8_t RAM[2*MB];
 
 Simulator OpcodeTable[256]={
-	//[0x00]={zero},
+	[0x00]={zero},
   [0x24]={addwf},
   [0x25]={addwf},
   [0x26]={addwf},
@@ -252,11 +252,12 @@ Simulator OpcodeTable[256]={
   [0xCF]={movff},
 };
 
-void Simulate(){
-    for(int i=0;i=4;i=GET_PC()){
-      uint8_t code=RAM[i];
-  		OpcodeTable[code].execute(&RAM[i]);
-    }
+void Simulate(int size){
+  int i=0;
+   while(i<size){
+     OpcodeTable[RAM[i]].execute(&RAM[i]);
+     i=GET_PC();
+   }
 }
 
 
@@ -388,6 +389,9 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code){
     }
 		else
 		ADD_PC(1);
+}
+void zero(){
+  int j=0;
 }
 /////////////////////////////////////////////////////////////////////////////
 //functions
