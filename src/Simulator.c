@@ -5,10 +5,10 @@
 
 uint8_t memory[32*KB];
 uint8_t FLASH[2*KB];
-uint8_t PM[2*MB];
+//uint8_t PM[2*MB];
 
 Simulator OpcodeTable[256]={
-	[0x00]={check},
+	[0x00]={zero},
   [0x24]={addwf},
   [0x25]={addwf},
   [0x26]={addwf},
@@ -253,6 +253,7 @@ Simulator OpcodeTable[256]={
   [0xCF]={movff},
 };
 
+
 void Simulate(int size){
   int i=0;
    while(i<size){
@@ -260,19 +261,52 @@ void Simulate(int size){
      i=GET_PC();
    }
 }
-void check(uint8_t* code){
+void zero(uint8_t *code){
 	uint8_t next_instruction=*(code+1);
 	switch(next_instruction){
 		case(0x08):tblrd();
-		case(0x09):tblrdpi();
-		case(0x0A):tblrdpd();
-		case(0x0B):tblrdi();
-		case(0x0C):tblwt();
-		case(0x0D):tblwtpi();
-		case(0x0E):tblwtpd();
-		case(0x0F):tblwtd();
-	}
+		//						break;
+			//case(0x09):tblrdpi();
+		//	case(0x0A):tblrdpd();
+			//case(0x0B):tblrdi();
+			//case(0x0C):tblwt();
+		//	case(0x0D):tblwtpi();
+		//	case(0x0E):tblwtpd();
+		//	case(0x0F):tblwtd();
+	};
+  ADD_PC(1);
 }
+	//uint8_t next_instruction=*(code+1);
+	//*WREG=next_instruction;
+
+	//Check[next_instruction].execute(&FLASH[0]);
+	//switch(next_instruction){
+	//	case(0x08):tblrd();
+	//						break;
+		//case(0x09):tblrdpi();
+	//	case(0x0A):tblrdpd();
+		//case(0x0B):tblrdi();
+		//case(0x0C):tblwt();
+	//	case(0x0D):tblwtpi();
+	//	case(0x0E):tblwtpd();
+	//	case(0x0F):tblwtd();
+//	}
+
+//}
+
+
+	//switch(next_instruction){
+		//case(0x08):tblrd();
+			//				break;
+		//case(0x09):tblrdpi();
+	//	case(0x0A):tblrdpd();
+		//case(0x0B):tblrdi();
+		//case(0x0C):tblwt();
+	//	case(0x0D):tblwtpi();
+	//	case(0x0E):tblwtpd();
+	//	case(0x0F):tblwtd();
+
+
 
 
 ////////////////////change value////////////////////////////////////////////////////
@@ -553,4 +587,18 @@ void iorwf(uint8_t *code){
 	storeFileReg(d,a,value,address);
 	SetZnN(value);
 	ADD_PC(1);
+}
+void tblrd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	uint32_t temp;
+
+	if(TBLPTR%2==0){
+		temp=TBLPTR+1;
+	}
+	else{
+		temp=TBLPTR-1;
+	}
+
+	*TABLAT=FLASH[temp];
+
 }

@@ -377,6 +377,20 @@ void test_iorwf_0x13_0x91_expect_0x93(void){
 		iorwf(code);
 		TEST_ASSERT_EQUAL_HEX16(memory[0x88],0x93);
 }
+void test_tblrd(void){
+	uint8_t code[]={0x0E,0x55,    //movlw 0x55
+									0x00,0x08};    //tblrd
+									//0xE4,0x01};   //bov 0x01
+	memcpy(FLASH,code,sizeof(code));
+	TEST_ASSERT_EQUAL_HEX16(FLASH[2],0x0);
+	*WREG=0;
+	CLEAR_PC();
+	//tblrd();
+	Simulate(sizeof(code));
+  TEST_ASSERT_EQUAL_HEX16(*TABLAT,0x55);
+	//TEST_ASSERT_EQUAL_HEX16(*BSR,0);
+	TEST_ASSERT_EQUAL_HEX16(*WREG,0x55);
+}
 void test_Simulate(void){
 	uint8_t code[]={0x0E,0x11,     //movlw 0x11
 									0x6E,0x56,   //movwf 0x56
@@ -399,5 +413,4 @@ void test_Simulate(void){
 	//(1000 1000)<-testing if the 4th bit is clear
 	//4th intruction line movff 0xFF,0x12(should be skipped)
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
-
 }

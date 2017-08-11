@@ -11,11 +11,11 @@ uint8_t TBLPTRH;
 uint8_t TBLPTRU;
 extern uint8_t memory[];
 extern uint8_t FLASH[];
-extern uint8_t PM[];
+//extern uint8_t PM[];
 
 #define KB 1024
 #define MB 1048576
-#define GET_TABLEPOINTER()    (TBLPTRL|(TBLPTRH<<8)|(TBLPTRU<<16))
+#define GET_TBLPTR()    (TBLPTRL|(TBLPTRH<<8)|(TBLPTRU<<16))
 #define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
 #define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
 #define Status    ((StatusReg*)&memory[0xFD8])
@@ -60,7 +60,11 @@ void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
 
+
+
+
 //functions
+void zero(uint8_t *code);
 void movlb(uint8_t *code);
 void movlw(uint8_t *code);
 void movwf(uint8_t *code);
@@ -84,7 +88,7 @@ void addwfc(uint8_t *code);
 void andwf(uint8_t *code);
 void comf(uint8_t *code);
 void iorwf(uint8_t *code);
-
+void tblrd();
 
 
 #endif // _SIMULATOR_H
