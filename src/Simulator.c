@@ -265,16 +265,18 @@ void zero(uint8_t *code){
 	uint8_t next_instruction=*(code+1);
 	switch(next_instruction){
 		case(0x08):tblrd();
-		//						break;
-			//case(0x09):tblrdpi();
-		//	case(0x0A):tblrdpd();
-			//case(0x0B):tblrdi();
+							break;
+		case(0x09):tblrdpi();
+							break;
+		case(0x0A):tblrdpd();
+							break;
+		case(0x0B):tblrdi();
+							break;
 			//case(0x0C):tblwt();
 		//	case(0x0D):tblwtpi();
 		//	case(0x0E):tblwtpd();
 		//	case(0x0F):tblwtd();
 	};
-  ADD_PC(1);
 }
 	//uint8_t next_instruction=*(code+1);
 	//*WREG=next_instruction;
@@ -436,7 +438,17 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code){
 		else
 		ADD_PC(1);
 }
-
+void rawTblrd(uint32_t TBLPTR){
+	uint32_t temp;
+	if(TBLPTR%2==0){
+		temp=TBLPTR+1;
+	}
+	else{
+		temp=TBLPTR-1;
+	}
+	*TABLAT=FLASH[temp];
+	ADD_PC(1);
+}
 /////////////////////////////////////////////////////////////////////////////
 //functions
 
@@ -590,15 +602,20 @@ void iorwf(uint8_t *code){
 }
 void tblrd(){
 	uint32_t TBLPTR=GET_TBLPTR();
-	uint32_t temp;
-
-	if(TBLPTR%2==0){
-		temp=TBLPTR+1;
-	}
-	else{
-		temp=TBLPTR-1;
-	}
-
-	*TABLAT=FLASH[temp];
-
+	rawTblrd(TBLPTR);
+}
+void tblrdpi(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+	TBLPTRL+=1;
+}
+void tblrdpd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+	TBLPTRL-=1;
+}
+void tblrdi(){
+	TBLPTRL+=1;
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
 }

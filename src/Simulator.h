@@ -15,7 +15,7 @@ extern uint8_t FLASH[];
 
 #define KB 1024
 #define MB 1048576
-#define GET_TBLPTR()    (TBLPTRL|(TBLPTRH<<8)|(TBLPTRU<<16))
+#define GET_TBLPTR()          (TBLPTRL|(TBLPTRH<<8)|(TBLPTRU<<16))
 #define GET_PC()              (PCL|(PCLATH<<8)|(PCLATU<<16))
 #define ADD_PC(step)          (SET_PC(GET_PC() + (step) * 2))
 #define Status    ((StatusReg*)&memory[0xFD8])
@@ -59,7 +59,7 @@ char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable);
 void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
-
+void rawTblrd(uint32_t TBLPTR);
 
 
 
@@ -89,6 +89,9 @@ void andwf(uint8_t *code);
 void comf(uint8_t *code);
 void iorwf(uint8_t *code);
 void tblrd();
+void tblrdpi();
+void tblrdpd();
+void tblrdi();
 
 
 #endif // _SIMULATOR_H
