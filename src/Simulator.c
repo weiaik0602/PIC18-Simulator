@@ -266,48 +266,23 @@ void zero(uint8_t *code){
 	switch(next_instruction){
 		case(0x08):tblrd();
 							break;
-		case(0x09):tblrdpi();
+		case(0x09):tblrdposi();
 							break;
-		case(0x0A):tblrdpd();
+		case(0x0A):tblrdposd();
 							break;
-		case(0x0B):tblrdi();
+		case(0x0B):tblrdprei();
 							break;
-			//case(0x0C):tblwt();
-		//	case(0x0D):tblwtpi();
-		//	case(0x0E):tblwtpd();
-		//	case(0x0F):tblwtd();
+		case(0x0C):tblwt();
+							break;
+		case(0x0D):tblwtposi();
+							break;
+		case(0x0E):tblwtposd();
+							break;
+		case(0x0F):tblwtprei();
+							break;
+			default:nop(code);
 	};
 }
-	//uint8_t next_instruction=*(code+1);
-	//*WREG=next_instruction;
-
-	//Check[next_instruction].execute(&FLASH[0]);
-	//switch(next_instruction){
-	//	case(0x08):tblrd();
-	//						break;
-		//case(0x09):tblrdpi();
-	//	case(0x0A):tblrdpd();
-		//case(0x0B):tblrdi();
-		//case(0x0C):tblwt();
-	//	case(0x0D):tblwtpi();
-	//	case(0x0E):tblwtpd();
-	//	case(0x0F):tblwtd();
-//	}
-
-//}
-
-
-	//switch(next_instruction){
-		//case(0x08):tblrd();
-			//				break;
-		//case(0x09):tblrdpi();
-	//	case(0x0A):tblrdpd();
-		//case(0x0B):tblrdi();
-		//case(0x0C):tblwt();
-	//	case(0x0D):tblwtpi();
-	//	case(0x0E):tblwtpd();
-	//	case(0x0F):tblwtd();
-
 
 
 
@@ -447,6 +422,22 @@ void rawTblrd(uint32_t TBLPTR){
 		temp=TBLPTR-1;
 	}
 	*TABLAT=FLASH[temp];
+	ADD_PC(1);
+}
+void ClrTBLPTR(){
+	TBLPTRL=0;
+	TBLPTRH=0;
+	TBLPTRU=0;
+}
+void rawTblwt(uint32_t TBLPTR){
+	uint32_t temp;
+	if(TBLPTR%2==0){
+		temp=TBLPTR+1;
+	}
+	else{
+		temp=TBLPTR-1;
+	}
+	FLASH[temp]=*TABLAT;
 	ADD_PC(1);
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -604,18 +595,37 @@ void tblrd(){
 	uint32_t TBLPTR=GET_TBLPTR();
 	rawTblrd(TBLPTR);
 }
-void tblrdpi(){
+void tblrdposi(){
 	uint32_t TBLPTR=GET_TBLPTR();
 	rawTblrd(TBLPTR);
 	TBLPTRL+=1;
 }
-void tblrdpd(){
+void tblrdposd(){
 	uint32_t TBLPTR=GET_TBLPTR();
 	rawTblrd(TBLPTR);
 	TBLPTRL-=1;
 }
-void tblrdi(){
+void tblrdprei(){
 	TBLPTRL+=1;
 	uint32_t TBLPTR=GET_TBLPTR();
 	rawTblrd(TBLPTR);
+}
+void tblwt(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+}
+void tblwtposi(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+	TBLPTRL+=1;
+}
+void tblwtposd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+	TBLPTRL-=1;
+}
+void tblwtprei(){
+	TBLPTRL+=1;
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
 }

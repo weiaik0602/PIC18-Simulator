@@ -60,7 +60,8 @@ void rawBitTestSkip(int x,uint8_t *code);
 void ClrStatus();
 void SetZnN(uint8_t result);
 void rawTblrd(uint32_t TBLPTR);
-
+void rawTblwt(uint32_t TBLPTR);
+void ClrTBLPTR();
 
 
 //functions
@@ -89,9 +90,12 @@ void andwf(uint8_t *code);
 void comf(uint8_t *code);
 void iorwf(uint8_t *code);
 void tblrd();
-void tblrdpi();
-void tblrdpd();
-void tblrdi();
-
+void tblrdposi();
+void tblrdposd();
+void tblrdprei();
+void tblwt();
+void tblwtposi();
+void tblwtposd();
+void tblwtprei();
 
 #endif // _SIMULATOR_H
