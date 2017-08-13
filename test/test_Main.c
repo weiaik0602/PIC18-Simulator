@@ -380,7 +380,7 @@ void test_iorwf_0x13_0x91_expect_0x93(void){
 void test_tblrd_expect_TABLAT_0x55_TBLPTR_0x00(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x08};    //tblrd*
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	tblrd();
   TEST_ASSERT_EQUAL_HEX16(*TABLAT,0x55);
@@ -389,7 +389,7 @@ void test_tblrd_expect_TABLAT_0x55_TBLPTR_0x00(void){
 void test_tblrdposi_expect_TABLAT_0x55_TBLPTR_0x01(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x08};    //tblrd*+
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	tblrdposi();
   TEST_ASSERT_EQUAL_HEX16(*TABLAT,0x55);
@@ -398,7 +398,7 @@ void test_tblrdposi_expect_TABLAT_0x55_TBLPTR_0x01(void){
 void test_tblrdposd_expect_TABLAT_0x0E_TBLPTR_0x01(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x08};    //tblrd*-
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	TBLPTRL=0x01;
 	tblrdposd();
   TEST_ASSERT_EQUAL_HEX16(*TABLAT,0x0E);
@@ -407,7 +407,7 @@ void test_tblrdposd_expect_TABLAT_0x0E_TBLPTR_0x01(void){
 void test_tblrdprei_expect_TABLAT_0x0E_TBLPTR_0x01(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x08};    //tblrd+*
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	tblrdprei();
   TEST_ASSERT_EQUAL_HEX16(*TABLAT,0x0E);
@@ -416,40 +416,40 @@ void test_tblrdprei_expect_TABLAT_0x0E_TBLPTR_0x01(void){
 void test_tblwt_expect(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x0C};    //tblwt*
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	*TABLAT=0xFF;
 	tblwt();
-	TEST_ASSERT_EQUAL_HEX16(FLASH[1],0xFF);
+	TEST_ASSERT_EQUAL_HEX16(ProgramMemory[1],0xFF);
 }
 void test_tblwtposi_expect(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x0D};    //tblwt*+
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	*TABLAT=0xFF;
 	tblwtposi();
-	TEST_ASSERT_EQUAL_HEX16(FLASH[1],0xFF);
+	TEST_ASSERT_EQUAL_HEX16(ProgramMemory[1],0xFF);
 	TEST_ASSERT_EQUAL_HEX16(GET_TBLPTR(),0x01);
 }
 void test_tblwtposd_expect(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x0E};    //tblwt*-
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	TBLPTRL=0x01;
 	*TABLAT=0xFF;
 	tblwtposd();
-	TEST_ASSERT_EQUAL_HEX16(FLASH[0],0xFF);
+	TEST_ASSERT_EQUAL_HEX16(ProgramMemory[0],0xFF);
 	TEST_ASSERT_EQUAL_HEX16(GET_TBLPTR(),0x00);
 }
 void test_tblwtprei_expect(void){
 	uint8_t code[]={0x0E,0x55,    //movlw 0x55
 									0x00,0x0F};    //tblwt+*
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	ClrTBLPTR();
 	*TABLAT=0xFF;
 	tblwtprei();
-	TEST_ASSERT_EQUAL_HEX16(FLASH[0],0xFF);
+	TEST_ASSERT_EQUAL_HEX16(ProgramMemory[0],0xFF);
 	TEST_ASSERT_EQUAL_HEX16(GET_TBLPTR(),0x01);
 }
 void test_Simulate(void){
@@ -463,7 +463,7 @@ void test_Simulate(void){
 	memory[0xFF]=0x14;
 	memory[0x12]=0;
 	int size=sizeof(code);
-	memcpy(FLASH,code,sizeof(code));
+	memcpy(ProgramMemory,code,sizeof(code));
 	Simulate(size);
 
 	//1st instruction line movlw 0x12

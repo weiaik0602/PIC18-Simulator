@@ -10,7 +10,7 @@ uint8_t TBLPTRL;
 uint8_t TBLPTRH;
 uint8_t TBLPTRU;
 extern uint8_t memory[];
-extern uint8_t FLASH[];
+extern uint8_t ProgramMemory[];
 //extern uint8_t PM[];
 
 #define KB 1024

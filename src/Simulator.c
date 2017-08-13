@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 uint8_t memory[32*KB];
-uint8_t FLASH[2*KB];
+uint8_t ProgramMemory[2*KB];
 //uint8_t PM[2*MB];
 
 Simulator OpcodeTable[256]={
@@ -257,7 +257,7 @@ Simulator OpcodeTable[256]={
 void Simulate(int size){
   int i=0;
    while(i<size){
-     OpcodeTable[FLASH[i]].execute(&FLASH[i]);
+     OpcodeTable[ProgramMemory[i]].execute(&ProgramMemory[i]);
      i=GET_PC();
    }
 }
@@ -421,7 +421,7 @@ void rawTblrd(uint32_t TBLPTR){
 	else{
 		temp=TBLPTR-1;
 	}
-	*TABLAT=FLASH[temp];
+	*TABLAT=ProgramMemory[temp];
 	ADD_PC(1);
 }
 void ClrTBLPTR(){
@@ -437,7 +437,7 @@ void rawTblwt(uint32_t TBLPTR){
 	else{
 		temp=TBLPTR-1;
 	}
-	FLASH[temp]=*TABLAT;
+	ProgramMemory[temp]=*TABLAT;
 	ADD_PC(1);
 }
 /////////////////////////////////////////////////////////////////////////////
