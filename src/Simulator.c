@@ -8,6 +8,8 @@ uint8_t flash[2*MB];
 uint8_t tableBuffer[8];
 
 
+int enableFlashWrite=0;
+
 Simulator OpcodeTable[256]={
 	[0x00]={zero},
   [0x24]={addwf},
@@ -252,16 +254,16 @@ Simulator OpcodeTable[256]={
   [0xCD]={movff},
   [0xCE]={movff},
   [0xCF]={movff},
+	[0xD0]={bra},
+	[0xD1]={bra},
+	[0xD2]={bra},
+	[0xD3]={bra},
+	[0xD4]={bra},
+	[0xD5]={bra},
+	[0xD6]={bra},
+	[0xD7]={bra},
 };
 
-
-void Simulate(int size){
-  int i=0;
-   while(i<size){
-     OpcodeTable[flash[i]].execute(&flash[i]);
-     i=GET_PC();
-   }
-}
 void zero(uint8_t *code){
 	uint8_t next_instruction=*(code+1);
 	switch(next_instruction){
@@ -285,6 +287,15 @@ void zero(uint8_t *code){
 	};
 }
 
+void Simulate(int size){
+  int i=0;
+   while(i<size){
+     OpcodeTable[flash[i]].execute(&flash[i]);
+     i=GET_PC();
+   }
+}
+
+
 
 
 ////////////////////change value////////////////////////////////////////////////////
@@ -297,11 +308,19 @@ unsigned int GetD(uint8_t *code){
 unsigned int GetB(uint8_t *code){
 	return (*code>>1)&0x0007;
 }
-unsigned int ChangeAddressWithBSR(unsigned int address){
-	unsigned int vBSR=*BSR;
+unsigned int GetAbsoluteAddress(int a,uint8_t address){
+	unsigned int vBSR=memory[BSR];
+	uint16_t newaddress;
 	vBSR=vBSR<<8;
-	address=address|vBSR;
-	return address;
+	if(a==1)
+		newaddress=address|vBSR;
+	else{
+		if(address>0x7F)
+			newaddress=0xF00|address;
+		else
+			newaddress=address;
+		}
+	return newaddress;
 }
 void SET_PC(int newAddr){
 	PCL=newAddr&0xFF;
@@ -313,31 +332,20 @@ void CLEAR_PC(){
   PCLATH=0;
   PCLATU=0;
 }
-void storeFileReg(int d,int a,uint8_t value,uint16_t address){
-	uint8_t *FileRegister;
-	unsigned int newaddress;
+void storeFileReg(int d,uint8_t value,uint16_t address){
+	if(address>0xF79){
+		if(address==EECON2){
+			if(memory[EECON2]==0x55 &&value==0xAA)
+				enableFlashWrite=1;
+			}
+		}
 	if(d==0)
-			*WREG=value;
-	else{
-		if(a==0){
-		FileRegister=&memory[address];
-		*FileRegister=value;
-		}
-		else{
-			newaddress=ChangeAddressWithBSR(address);
-			FileRegister=&memory[newaddress];
-			*FileRegister=value;
-		}
-	}
+			memory[WREG]=value;
+	else
+		memory[address]=value;
 }
-int GetValue(int a,unsigned int address){
-	unsigned int newaddress;
-	if(a==0)
+int GetValue(unsigned int address){
 		return memory[address];
-	else{
-		newaddress=ChangeAddressWithBSR(address);
-		return memory[newaddress];
-	}
 }
 char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable){
 	uint16_t result;
@@ -385,15 +393,15 @@ void SetZnN(uint8_t value){
 		Status->Z=1;
 	else
 		Status->Z=0;
-
 }
-void rawBitTestSkip(int x,uint8_t *code){
+void rawBitTestSkip(int xpectedBit,uint8_t *code){
 		unsigned int a=GetA(code);
 		unsigned int b=GetB(code);
 		unsigned int address=*(code+1);
-		uint8_t value=GetValue(a,address);
+		address=GetAbsoluteAddress(a,address);
+		uint8_t value=GetValue(address);
 		unsigned int bit=(value>>b)&0x01;
-		if(bit==x)
+		if(bit==xpectedBit)
 			ADD_PC(2);
 		else
 			ADD_PC(1);
@@ -412,6 +420,11 @@ void rawCondBranch(int CondBit,int ExpectedBit,uint8_t *code){
 		else
 		ADD_PC(1);
 }
+void ClrTBLPTR(){
+	TBLPTRL=0;
+	TBLPTRH=0;
+	TBLPTRU=0;
+}
 void rawTblrd(uint32_t TBLPTR){
 	uint32_t temp;
 	if(TBLPTR%2==0){
@@ -420,100 +433,104 @@ void rawTblrd(uint32_t TBLPTR){
 	else{
 		temp=TBLPTR-1;
 	}
-	*TABLAT=flash[temp];
+	storeFileReg(1,flash[temp],TABLAT);
 	ADD_PC(1);
 }
-void ClrTBLPTR(){
-	TBLPTRL=0;
-	TBLPTRH=0;
-	TBLPTRU=0;
-}
+
 void rawTblwt(uint32_t TBLPTR){
-	uint32_t temp;
-	if(TBLPTR%2==0){
-		temp=TBLPTR+1;
+	if(enableFlashWrite==1){
+		uint32_t TBptr=TBLPTR;
+		while(TBptr>7){
+			TBptr-=8;
+		}
+	tableBuffer[TBptr]=memory[TABLAT];
 	}
-	else{
-		temp=TBLPTR-1;
-	}
-	flash[temp]=*TABLAT;
 	ADD_PC(1);
 }
+
 /////////////////////////////////////////////////////////////////////////////
 //functions
 
 void movlb(uint8_t *code){
-	*BSR=*(code+1)&0xF;
+	storeFileReg(1,*(code+1)&0xF,BSR);
 	ADD_PC(1);
 }
 void movlw(uint8_t *code){
-  *WREG=*(code+1);
+	storeFileReg(1,*(code+1),WREG);
 	ADD_PC(1);
 }
 void movwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int address=*(code+1);
-	storeFileReg(1,a,*WREG,address);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(WREG);
+	storeFileReg(1,value,address);
 	ADD_PC(1);
 }
 void addwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	uint8_t realresult;
-	int v1=GetValue(a,address);
-	int v2=*WREG;
+	int v1=GetValue(address);
+	int v2=GetValue(WREG);
 	realresult=rawAdd(v1,v2,0);
-	storeFileReg(d,a,realresult,address);
+	storeFileReg(d,realresult,address);
 	ADD_PC(1);
 }
 void subwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	uint8_t realresult;
-	int v1=GetValue(a,address);
-	int v2=*WREG;
+	int v1=GetValue(address);
+	int v2=GetValue(WREG);
 	realresult=rawAdd(v1,-v2,0);
-	storeFileReg(d,a,realresult,address);
+	storeFileReg(d,realresult,address);
 	ADD_PC(1);
 }
 void bcf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int b=GetB(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	uint8_t reset=~(0x01<<b);
-	int v1=GetValue(a,address);
-	storeFileReg(1,a,(v1&reset),address);
+	int v1=GetValue(address);
+	storeFileReg(1,(v1&reset),address);
 	ADD_PC(1);
 }
 void bsf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int b=GetB(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	uint8_t reset=(0x01<<b);
-	int v1=GetValue(a,address);
-	storeFileReg(1,a,(v1|reset),address);
+	int v1=GetValue(address);
+	storeFileReg(1,(v1|reset),address);
 	ADD_PC(1);
 }
 void setf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int address=*(code+1);
-	storeFileReg(1,a,0xFF,address);
+	address=GetAbsoluteAddress(a,address);
+	storeFileReg(1,0xFF,address);
 	ADD_PC(1);
 }
 void clrf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int address=*(code+1);
-	storeFileReg(1,a,0x00,address);
+	address=GetAbsoluteAddress(a,address);
+	storeFileReg(1,0x00,address);
 	Status->Z=1;
 	ADD_PC(1);
 }
 void btfss(uint8_t *code){
-	rawBitTestSkip(1,code);
+	rawBitTestSkip(SET,code);
 }
 void btfsc(uint8_t *code){
-	rawBitTestSkip(0,code);
+	rawBitTestSkip(CLEAR,code);
 }
 void nop(uint8_t *code){
 	ADD_PC(1);
@@ -546,27 +563,28 @@ void addwfc(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	uint8_t realresult;
-	int v1=GetValue(a,address);
-	int v2=*WREG;
+	int v1=GetValue(address);
+	int v2=GetValue(WREG);
 	realresult=rawAdd(v1,v2,1);
-	storeFileReg(d,a,realresult,address);
+	storeFileReg(d,realresult,address);
 	ADD_PC(1);
 }
 void andwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
 	unsigned int result;
 	uint8_t realresult;
-	uint8_t *FileRegister;
 
-	int v1=GetValue(a,address);
-	int v2=*WREG;
+	int v1=GetValue(address);
+	int v2=GetValue(WREG);
 	result=v2&v1;
 	realresult=result&0xFF;
 
-	storeFileReg(d,a,realresult,address);
+	storeFileReg(d,realresult,address);
 	SetZnN(realresult);
 	ADD_PC(1);
 }
@@ -574,9 +592,10 @@ void comf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
-	uint8_t value=GetValue(a,address);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(address);
 	value=~value;
-	storeFileReg(d,a,value,address);
+	storeFileReg(d,value,address);
 	SetZnN(value);
 	ADD_PC(1);
 }
@@ -584,10 +603,20 @@ void iorwf(uint8_t *code){
 	unsigned int a=GetA(code);
 	unsigned int d=GetD(code);
 	unsigned int address=*(code+1);
-	uint8_t value=GetValue(a,address);
-	value=value|*WREG;
-	storeFileReg(d,a,value,address);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(address);
+	value=value|GetValue(WREG);
+	storeFileReg(d,value,address);
 	SetZnN(value);
+	ADD_PC(1);
+}
+void bra(uint8_t *code){
+	uint16_t step=((*code)&0x07)<<8|*(code+1);
+	if(step<0x400)
+	 	ADD_PC(step);
+	else
+		ADD_PC(-(0x800-step));
+
 	ADD_PC(1);
 }
 void tblrd(){
