@@ -3,9 +3,10 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-uint8_t memory[32*KB];
-uint8_t ProgramMemory[2*KB];
-//uint8_t PM[2*MB];
+uint8_t memory[4*KB];
+uint8_t flash[2*MB];
+uint8_t tableBuffer[8];
+
 
 Simulator OpcodeTable[256]={
 	[0x00]={zero},
@@ -257,7 +258,7 @@ Simulator OpcodeTable[256]={
 void Simulate(int size){
   int i=0;
    while(i<size){
-     OpcodeTable[ProgramMemory[i]].execute(&ProgramMemory[i]);
+     OpcodeTable[flash[i]].execute(&flash[i]);
      i=GET_PC();
    }
 }
@@ -312,7 +313,7 @@ void CLEAR_PC(){
   PCLATH=0;
   PCLATU=0;
 }
-void storeFileReg(int d,int a,uint8_t value,uint8_t address){
+void storeFileReg(int d,int a,uint8_t value,uint16_t address){
 	uint8_t *FileRegister;
 	unsigned int newaddress;
 	if(d==0)
@@ -342,14 +343,12 @@ char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable){
 	uint16_t result;
 	uint8_t realresult;
 	uint16_t decimalresult;
-	if(CarryEnable==1){
-		result= (v1)+(v2)+Status->C;
-		decimalresult=(v1&0xF)+(v2&0xF)+Status->C;
-	}
-	else{
-		result= (v1)+(v2);
-		decimalresult=(v1&0xF)+(v2&0xF);
-	}
+	if(CarryEnable==1)
+		Status->C=Status->C;
+	else
+		Status->C=0;
+	result= (v1)+(v2)+Status->C;
+	decimalresult=(v1&0xF)+(v2&0xF)+Status->C;
 	realresult=result&0xFF;
 	if(decimalresult>0xF)
 		Status->DC=1;
@@ -421,7 +420,7 @@ void rawTblrd(uint32_t TBLPTR){
 	else{
 		temp=TBLPTR-1;
 	}
-	*TABLAT=ProgramMemory[temp];
+	*TABLAT=flash[temp];
 	ADD_PC(1);
 }
 void ClrTBLPTR(){
@@ -437,7 +436,7 @@ void rawTblwt(uint32_t TBLPTR){
 	else{
 		temp=TBLPTR-1;
 	}
-	ProgramMemory[temp]=*TABLAT;
+	flash[temp]=*TABLAT;
 	ADD_PC(1);
 }
 /////////////////////////////////////////////////////////////////////////////
