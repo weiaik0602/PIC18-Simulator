@@ -352,33 +352,33 @@ char rawAdd(uint16_t v1,uint16_t v2,uint8_t CarryEnable){
 	uint8_t realresult;
 	uint16_t decimalresult;
 	if(CarryEnable==1)
-		Status->C=Status->C;
+		STATUS->C=STATUS->C;
 	else
-		Status->C=0;
-	result= (v1)+(v2)+Status->C;
-	decimalresult=(v1&0xF)+(v2&0xF)+Status->C;
+		STATUS->C=0;
+	result= (v1)+(v2)+STATUS->C;
+	decimalresult=(v1&0xF)+(v2&0xF)+STATUS->C;
 	realresult=result&0xFF;
 	if(decimalresult>0xF)
-		Status->DC=1;
+		STATUS->DC=1;
 	else
-		Status->DC=0;
+		STATUS->DC=0;
 	if(result>0xFF)
-		Status->C=1;
+		STATUS->C=1;
 	else
-		Status->C=0;
+		STATUS->C=0;
 	if(realresult==0)
-		Status->Z=1;
+		STATUS->Z=1;
 	else
-		Status->Z=0;
+		STATUS->Z=0;
 	if(realresult>0x79)   //0x80 to 0xFF is negative num
-		Status->N=1;
+		STATUS->N=1;
 	else
-		Status->N=0;
-	Status->OV=0;
+		STATUS->N=0;
+	STATUS->OV=0;
 	if(v1<0x80&&v2<0x80&&realresult>0x79)   //v1(pos)+v2(pos)=neg
-		Status->OV=1;
+		STATUS->OV=1;
 	if(v1>0x79&&v2>0x79&&realresult<0x80)   //v1(neg)+v2(neg)=pos
-		Status->OV=1;
+		STATUS->OV=1;
 	return realresult;
 }
 void ClrStatus(){
@@ -386,13 +386,13 @@ void ClrStatus(){
 }
 void SetZnN(uint8_t value){
 	if(value>0x79)
-		Status->N=1;
+		STATUS->N=1;
 	else
-		Status->N=0;
+		STATUS->N=0;
 	if(value==0)
-		Status->Z=1;
+		STATUS->Z=1;
 	else
-		Status->Z=0;
+		STATUS->Z=0;
 }
 void rawBitTestSkip(int xpectedBit,uint8_t *code){
 		unsigned int a=GetA(code);
@@ -436,7 +436,6 @@ void rawTblrd(uint32_t TBLPTR){
 	storeFileReg(1,flash[temp],TABLAT);
 	ADD_PC(1);
 }
-
 void rawTblwt(uint32_t TBLPTR){
 	if(enableFlashWrite==1){
 		uint32_t TBptr=TBLPTR;
@@ -523,7 +522,7 @@ void clrf(uint8_t *code){
 	unsigned int address=*(code+1);
 	address=GetAbsoluteAddress(a,address);
 	storeFileReg(1,0x00,address);
-	Status->Z=1;
+	STATUS->Z=1;
 	ADD_PC(1);
 }
 void btfss(uint8_t *code){
