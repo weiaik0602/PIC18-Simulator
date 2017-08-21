@@ -150,3 +150,13 @@ void rawTblwt(uint32_t TBLPTR){
 	}
 	ADD_PC(1);
 }
+uint8_t rawDecOrInc(uint8_t *code,int value){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int result=GetValue(address);
+	result=result+(value);
+	storeFileReg(d,result,address);
+	return result;
+}

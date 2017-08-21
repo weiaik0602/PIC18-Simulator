@@ -213,3 +213,170 @@ void tblwtprei(){
 	uint32_t TBLPTR=GET_TBLPTR();
 	rawTblwt(TBLPTR);
 }
+void cpfseq(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	int v2=memory[WREG];
+	if(v1==v2)
+		ADD_PC(2);
+	else
+		ADD_PC(1);
+}
+void cpfsgt(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	int v2=memory[WREG];
+	if(v1>v2)
+		ADD_PC(2);
+	else
+		ADD_PC(1);
+}
+void cpfslt(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	int v2=memory[WREG];
+	if(v1<v2)
+		ADD_PC(2);
+	else
+		ADD_PC(1);
+}
+void decf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t realresult;
+	int v1=GetValue(address);
+	int v2=-1;
+	realresult=rawAdd(v1,v2,0);
+	storeFileReg(d,realresult,address);
+	ADD_PC(1);
+}
+void decfsz(uint8_t *code){
+	int result=rawDecOrInc(code,-1);
+	if(result==0)
+	ADD_PC(2);
+	else
+	ADD_PC(1);
+}
+void dcfsnz(uint8_t *code){
+	int result=rawDecOrInc(code,-1);
+	if(result!=0)
+	ADD_PC(2);
+	else
+	ADD_PC(1);
+}
+void incf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t realresult;
+	int v1=GetValue(address);
+	int v2=1;
+	realresult=rawAdd(v1,v2,0);
+	storeFileReg(d,realresult,address);
+	ADD_PC(1);
+}
+void incfsz(uint8_t *code){
+	int result=rawDecOrInc(code,1);
+	if(result==0)
+	ADD_PC(2);
+	else
+	ADD_PC(1);
+}
+void infsnz(uint8_t *code){
+	int result=rawDecOrInc(code,1);
+	if(result!=0)
+	ADD_PC(2);
+	else
+	ADD_PC(1);
+}
+void movf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int value=GetValue(address);
+	SetZnN(value);
+	storeFileReg(d,value,address);
+	ADD_PC(1);
+}
+void mulwf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int value=GetValue(address);
+	value=value*memory[WREG];
+	storeFileReg(d,value,address);
+	ADD_PC(1);
+}
+void negf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t realresult;
+	int v1=GetValue(address);
+	int v2=v1*2;
+	realresult=rawAdd(v1,-v2,0);
+	storeFileReg(d,realresult,address);
+	ADD_PC(1);
+}
+void rlcf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	uint8_t Cbit=STATUS->C;
+	STATUS->C=(v1>>7)&0x01;
+	v1=(v1<<1)|Cbit;
+	SetZnN(v1);
+	storeFileReg(d,v1,address);
+	ADD_PC(1);
+}
+void rlncf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	uint8_t Cbit=(v1>>7)&0x01;
+	v1=(v1<<1)|Cbit;
+	SetZnN(v1);
+	storeFileReg(d,v1,address);
+	ADD_PC(1);
+}
+void rrcf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	uint8_t Cbit=STATUS->C;
+	STATUS->C=(v1)&0x01;
+	v1=(v1>>1)|(Cbit<<7);
+	SetZnN(v1);
+	storeFileReg(d,v1,address);
+	ADD_PC(1);
+}
+void rrncf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	int v1=GetValue(address);
+	uint8_t Cbit=(v1)&0x01;
+	v1=(v1>>1)|(Cbit<<7);
+	SetZnN(v1);
+	storeFileReg(d,v1,address);
+	ADD_PC(1);
+}

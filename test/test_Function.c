@@ -308,3 +308,184 @@ void test_tblwtprei_expect_TBLPTR_1(void){
 	TEST_ASSERT_EQUAL_HEX16(tableBuffer[1],0x97);
 	TEST_ASSERT_EQUAL_HEX16(GET_TBLPTR(),1);
 }
+void test_cpfseq_expect_PC_0x04(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x32;
+  memory[WREG]=0x32;
+	cpfseq(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_cpfseq_expect_PC_0x02(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x31;
+  memory[WREG]=0x32;
+	cpfseq(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_cpfsgt_expect_PC_0x04(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x32;
+  memory[WREG]=0x31;
+	cpfsgt(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_cpfsgt_expect_PC_0x02(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x32;
+  memory[WREG]=0x32;
+	cpfsgt(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_cpfslt_expect_PC_0x04(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x28;
+  memory[WREG]=0x32;
+	cpfslt(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_cpfslt_expect_PC_0x02(void){
+  uint8_t code[]={0x62,0x01};
+	CLEAR_PC();
+  memory[0x01]=0x32;
+  memory[WREG]=0x32;
+	cpfslt(code);
+	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_decf_expect_0xFF(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0;
+  decf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x01],0xFF);
+}
+void test_decf_expect_0x01(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x02;
+  decf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x01],0x01);
+}
+void test_decfsz_expect_PC_0x04(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x01;
+  CLEAR_PC();
+  decfsz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_decfsz_expect_PC_0x02(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x02;
+  CLEAR_PC();
+  decfsz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_dcfsnz_expect_PC_0x04(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x02;
+  CLEAR_PC();
+  dcfsnz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_dcfsnz_expect_PC_0x02(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x01;
+  CLEAR_PC();
+  dcfsnz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_incf_expect_0x77(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x76;
+  incf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x01],0x77);
+}
+void test_incf_expect_0x00(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0xFF;
+  incf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x01],0x00);
+}
+void test_incfsz_expect_PC_0x04(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0xFF;
+  CLEAR_PC();
+  incfsz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_incfsz_expect_PC_0x02(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x02;
+  CLEAR_PC();
+  incfsz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_infsnz_expect_PC_0x04(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0x02;
+  CLEAR_PC();
+  infsnz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x04);
+}
+void test_infsnz_expect_PC_0x02(void){
+  uint8_t code[]={0x02,0x01};
+  memory[0x01]=0xFF;
+  CLEAR_PC();
+  infsnz(code);
+  TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
+}
+void test_movf_expect_0x99_in_0x12(void){
+    uint8_t code[]={0x02,0x12};
+    memory[0x12]=0x99;
+    movf(code);
+    TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x99);
+    TEST_ASSERT_EQUAL_HEX16(STATUS->N,1);
+    TEST_ASSERT_EQUAL_HEX16(STATUS->Z,0);
+}
+void test_mulwf_expect_0x21(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0x11;    //0x11*0x11=0x121
+  memory[WREG]=0x11;     //take only 8bit =0x21
+  mulwf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0x21);
+}
+void test_negf_expect_0xC6(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0x3A;
+  negf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xC6);
+}
+void test_rlcf_expect_0xCC(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0xE6;
+  ClrStatus();
+  rlcf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xCC);
+  TEST_ASSERT_EQUAL_HEX16(STATUS->C,1);
+}
+void test_rlncf_expect_0xCC(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0xE6;
+  ClrStatus();
+  rlncf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xCD);
+  TEST_ASSERT_EQUAL_HEX16(STATUS->C,0);
+}
+void test_rrcf_expect_0xCC(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0xD7;
+  ClrStatus();
+  rrcf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0x6B);
+  TEST_ASSERT_EQUAL_HEX16(STATUS->C,1);
+}
+void test_rrncf_expect_0xCC(void){
+  uint8_t code[]={0x02,0x33};
+  memory[0x33]=0xD7;
+  ClrStatus();
+  rrncf(code);
+  TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xEB);
+  TEST_ASSERT_EQUAL_HEX16(STATUS->C,0);
+}

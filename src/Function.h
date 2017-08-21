@@ -36,6 +36,20 @@ void tblwtposi();
 void tblwtposd();
 void tblwtprei();
 void bra(uint8_t *code);
-
-
+void cpfseq(uint8_t *code);
+void cpfsgt(uint8_t *code);
+void cpfslt(uint8_t *code);
+void decf(uint8_t *code);
+void decfsz(uint8_t *code);
+void dcfsnz(uint8_t *code);
+void incf(uint8_t *code);
+void incfsz(uint8_t *code);
+void infsnz(uint8_t *code);
+void movf(uint8_t *code);
+void mulwf(uint8_t *code);
+void negf(uint8_t *code);
+void rlcf(uint8_t *code);
+void rlncf(uint8_t *code);
+void rrcf(uint8_t *code);
+void rrncf(uint8_t *code);
 #endif // _FUNCTION_H

@@ -1,6 +1,8 @@
 #include "Simulator.h"
 #include "GlobalVariable.h"
 #include "Function.h"
+//#include "Exception.h"
+//#include "CExceptionConfig.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -21,7 +23,7 @@ Simulator OpcodeTable[256]={
   [0x17]={andwf},
   [0x6B]={clrf},
   [0x6A]={clrf},
-/*  [0x1C]={comf},
+  [0x1C]={comf},
   [0x1D]={comf},
   [0x1E]={comf},
   [0x1F]={comf},
@@ -54,18 +56,18 @@ Simulator OpcodeTable[256]={
   [0x48]={infsnz},
   [0x49]={infsnz},
   [0x4A]={infsnz},
-  [0x4B]={infsnz},*/
+  [0x4B]={infsnz},
   [0x10]={iorwf},
   [0x11]={iorwf},
   [0x12]={iorwf},
   [0x13]={iorwf},
-/*  [0x50]={movf},
+  [0x50]={movf},
   [0x51]={movf},
   [0x52]={movf},
-  [0x53]={movf},*/
+  [0x53]={movf},
   [0x6E]={movwf},
   [0x6F]={movwf},
-/*  [0x02]={mulwf},
+  [0x02]={mulwf},
   [0x03]={mulwf},
   [0x6C]={negf},
   [0x6D]={negf},
@@ -84,7 +86,7 @@ Simulator OpcodeTable[256]={
   [0x40]={rrncf},
   [0x41]={rrncf},
   [0x42]={rrncf},
-  [0x43]={rrncf},*/
+  [0x43]={rrncf},
   [0x68]={setf},
   [0x69]={setf},
 /*  [0x54]={subfwb},
@@ -281,10 +283,17 @@ void zero(uint8_t *code){
 			default:nop(code);
 	};
 }
+void simulateInstruction(int numberOfInstruction){
+	int temp=(numberOfInstruction*2)-2;
+//	if(OpcodeTable[flash[temp]].execute(&flash[temp])==0){
+	//	throwException(temp,"\n Program stopped. Invalid opcode detected: 0x%2x",temp);
+	//}
+	OpcodeTable[flash[temp]].execute(&flash[temp]);
 
-void Simulate(int size){
+}
+void simulateAll(){
   int i=0;
-   while(i<size){
+   while(i<2*MB){
      OpcodeTable[flash[i]].execute(&flash[i]);
      i=GET_PC();
    }

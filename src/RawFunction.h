@@ -18,6 +18,6 @@ void SetZnN(uint8_t result);
 void rawTblrd(uint32_t TBLPTR);
 void rawTblwt(uint32_t TBLPTR);
 void ClrTBLPTR();
-
+uint8_t rawDecOrInc(uint8_t *code,int value);
 
 #endif // _RAWFUNCTION_H

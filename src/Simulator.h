@@ -8,5 +8,6 @@ typedef struct Simulator Simulator;
 struct Simulator{
   void (*execute)(uint8_t *code);
 };
-void Simulate(int size);
+void simulateInstruction(int numberOfInstruction);
+void simulateAll();
 #endif // _SIMULATOR_H
