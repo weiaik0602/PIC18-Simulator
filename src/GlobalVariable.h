@@ -41,5 +41,12 @@ uint8_t TBLPTRU;
 
 //structure
 typedef struct StatusReg StatusReg;
+struct StatusReg{
+  uint8_t C:1;
+  uint8_t DC:1;
+  uint8_t Z:1;
+  uint8_t OV:1;
+  uint8_t N:1;
+};
 
 #endif // _GLOBALVARIABLE_H
