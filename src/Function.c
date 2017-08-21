@@ -6,7 +6,58 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //functions
-
+void tblrd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+}
+void tblrdposi(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+	TBLPTRL+=1;
+}
+void tblrdposd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+	TBLPTRL-=1;
+}
+void tblrdprei(){
+	TBLPTRL+=1;
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblrd(TBLPTR);
+}
+void tblwt(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+}
+void tblwtposi(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+	TBLPTRL+=1;
+}
+void tblwtposd(){
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+	TBLPTRL-=1;
+}
+void tblwtprei(){
+	TBLPTRL+=1;
+	uint32_t TBLPTR=GET_TBLPTR();
+	rawTblwt(TBLPTR);
+}
+void daw(){
+	uint8_t value=GetValue(WREG);
+	uint8_t v30=(value&0x0F);
+	uint8_t v74=(value&0xF0)>>4;
+	if(v30>9||STATUS->DC==1)
+		v30=v30+6;
+	else
+		v30=v30;
+	if(v74>9||STATUS->C==1)
+		v74=v74+6;
+	else
+		v74=v74;
+	memory[WREG]=(v74<<4)|v30;
+}
 void movlb(uint8_t *code){
 	storeFileReg(1,*(code+1)&0xF,BSR);
 	ADD_PC(1);
@@ -88,6 +139,20 @@ void btfss(uint8_t *code){
 void btfsc(uint8_t *code){
 	rawBitTestSkip(CLEAR,code);
 }
+void btg(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int b=GetB(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(address);
+	char bit=(value>>b)&0x01;
+	bit=(~bit)|0xFE;
+	bit=bit<<b;
+	uint8_t mask=~(0x01<<b);
+	bit=bit|mask;
+	value=value&bit;
+	storeFileReg(1,value,address);
+}
 void nop(uint8_t *code){
 	ADD_PC(1);
 }
@@ -102,6 +167,12 @@ void bc(uint8_t *code){
 }
 void bnc(uint8_t *code){
 	rawCondBranch(C_Bit,0,code);
+}
+void bn(uint8_t *code){
+  rawCondBranch(N_Bit,1,code);
+}
+void bnn(uint8_t *code){
+	rawCondBranch(N_Bit,0,code);
 }
 void bz(uint8_t *code){
 	rawCondBranch(Z_Bit,1,code);
@@ -172,46 +243,7 @@ void bra(uint8_t *code){
 	 	ADD_PC(step);
 	else
 		ADD_PC(-(0x800-step));
-
 	ADD_PC(1);
-}
-void tblrd(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblrd(TBLPTR);
-}
-void tblrdposi(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblrd(TBLPTR);
-	TBLPTRL+=1;
-}
-void tblrdposd(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblrd(TBLPTR);
-	TBLPTRL-=1;
-}
-void tblrdprei(){
-	TBLPTRL+=1;
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblrd(TBLPTR);
-}
-void tblwt(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblwt(TBLPTR);
-}
-void tblwtposi(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblwt(TBLPTR);
-	TBLPTRL+=1;
-}
-void tblwtposd(){
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblwt(TBLPTR);
-	TBLPTRL-=1;
-}
-void tblwtprei(){
-	TBLPTRL+=1;
-	uint32_t TBLPTR=GET_TBLPTR();
-	rawTblwt(TBLPTR);
 }
 void cpfseq(uint8_t *code){
 	unsigned int a=GetA(code);
@@ -379,4 +411,112 @@ void rrncf(uint8_t *code){
 	SetZnN(v1);
 	storeFileReg(d,v1,address);
 	ADD_PC(1);
+}
+void swapf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(address);
+	uint8_t v1=(value&0x0F)<<4;
+	uint8_t v2=(value&0xF0)>>4;
+	value=v1|v2;
+	storeFileReg(d,value,address);
+	ADD_PC(1);
+}
+void tstfsz(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t value=GetValue(address);
+	if(value==0)
+		ADD_PC(2);
+	else
+		ADD_PC(1);
+}
+void xorwf(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t v1=GetValue(address);
+	uint8_t v2=GetValue(WREG);
+	uint8_t result=v1^v2;
+	storeFileReg(d,result,address);
+	ADD_PC(1);
+}
+void addlw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint8_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=rawAdd(v1,v2,0);
+	memory[WREG]=realresult;
+	ADD_PC(1);
+}
+void andlw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint8_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=v1&v2;
+	memory[WREG]=realresult;
+	SetZnN(realresult);
+	ADD_PC(1);
+}
+void mullw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint16_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=v1*v2;
+	memory[PRODH]=realresult>>8;
+	memory[PRODL]=realresult&0xFF;
+	ADD_PC(1);
+}
+void sublw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint16_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=rawAdd(v1,-v2,0);
+	storeFileReg(d,realresult,WREG);
+	if(realresult<0x80)
+		STATUS->C=1;
+	else
+		STATUS->C=0;
+	ADD_PC(1);
+}
+void xorlw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint16_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=v1^v2;
+	memory[WREG]=realresult;
+	ADD_PC(1);
+}
+void iorlw(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	uint16_t realresult;
+	int v1=*(code+1);
+	int v2=GetValue(WREG);
+	realresult=v1|v2;
+	memory[WREG]=realresult;
+	ADD_PC(1);
+}
+void goto1(uint8_t *code){
+	uint8_t v70=*(code+1);
+	uint8_t v158=*(code+3);
+	uint8_t v1916=*(code+2)&0xF;
+	PCL=v70;
+	PCLATH=v158;
+	PCLATU=v1916;
 }

@@ -15,8 +15,9 @@ extern int enableFlashWrite;
 #define SET        1
 #define CLEAR      0
 #define C_Bit      0
-#define OV_Bit     3
 #define Z_Bit      2
+#define OV_Bit     3
+#define N_Bit      4
 
 uint8_t PCL;
 uint8_t PCLATH;
@@ -38,7 +39,8 @@ uint8_t TBLPTRU;
 #define BSR       0xFE0
 #define TABLAT    0xFF5
 #define EECON2    0xFA7
-
+#define PRODH     0xFF4
+#define PRODL     0xFF3
 //structure
 typedef struct StatusReg StatusReg;
 struct StatusReg{

@@ -100,17 +100,17 @@ Simulator OpcodeTable[256]={
   [0x58]={subwfb},
   [0x59]={subwfb},
   [0x5A]={subwfb},
-  [0x5B]={subwfb},
+  [0x5B]={subwfb},*/
   [0x38]={swapf},
   [0x39]={swapf},
   [0x3A]={swapf},
   [0x3B]={swapf},
-  [0x67]={tstfsz2},
+  [0x67]={tstfsz},
   [0x68]={tstfsz},
   [0x18]={xorwf},
   [0x19]={xorwf},
   [0x1A]={xorwf},
-  [0x1B]={xorwf},*/
+  [0x1B]={xorwf},
   [0x90]={bcf},
   [0x91]={bcf},
   [0x92]={bcf},
@@ -174,7 +174,7 @@ Simulator OpcodeTable[256]={
   [0xAC]={btfss},
   [0xAD]={btfss},
   [0xAE]={btfss},
-  [0xAF]={btfss},/*
+  [0xAF]={btfss},
   [0x70]={btg},
   [0x71]={btg},
   [0x72]={btg},
@@ -190,24 +190,23 @@ Simulator OpcodeTable[256]={
   [0x7C]={btg},
   [0x7D]={btg},
   [0x7E]={btg},
-  [0x7F]={btg},*/
+  [0x7F]={btg},
   [0xE1]={bnz},
   [0xE2]={bc},
   [0xE3]={bnc},
   [0xE4]={bov},
-  [0xE5]={bnov},/*
+  [0xE5]={bnov},
   [0xE6]={bn},
   [0xE7]={bnn},
   [0x08]={sublw},
   [0x09]={iorlw},
   [0x0A]={xorlw},
   [0x0B]={andlw},
-  [0x0C]={retlw},
+//  [0x0C]={retlw},
   [0x0D]={mullw},
-
   [0x0F]={addlw},
-  [0x01]={movlb},*/
-	 [0x0E]={movlw},
+  [0x01]={movlb},
+  [0x0E]={movlw},
   [0xF0]={nop},
   [0xF1]={nop},
   [0xF2]={nop},
@@ -264,6 +263,10 @@ Simulator OpcodeTable[256]={
 void zero(uint8_t *code){
 	uint8_t next_instruction=*(code+1);
 	switch(next_instruction){
+		case(0x00):nop(code);
+								break;
+		case(0x07):daw();
+							 break;
 		case(0x08):tblrd();
 							break;
 		case(0x09):tblrdposi();
