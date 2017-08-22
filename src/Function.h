@@ -66,4 +66,6 @@ void xorlw(uint8_t *code);
 void btg(uint8_t *code);
 void iorlw(uint8_t *code);
 void goto1(uint8_t *code);
+void subwfb(uint8_t *code);
+void subfwb(uint8_t *code);
 #endif // _FUNCTION_H

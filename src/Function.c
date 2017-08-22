@@ -524,3 +524,36 @@ void goto1(uint8_t *code){
 	PCLATH=v158;
 	PCLATU=v1916;
 }
+void subwfb(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t realresult;
+	int v1=GetValue(address);
+	int C=STATUS->C;
+	int v2=(GetValue(WREG))-~(C);
+	realresult=rawAdd(v1,-v2,0);
+	storeFileReg(d,realresult,address);
+	if(realresult<0x80)
+		STATUS->C=1;
+	else
+		STATUS->C=0;
+	ADD_PC(1);
+}
+void subfwb(uint8_t *code){
+	unsigned int a=GetA(code);
+	unsigned int d=GetD(code);
+	unsigned int address=*(code+1);
+	address=GetAbsoluteAddress(a,address);
+	uint8_t realresult;
+	int v1=GetValue(WREG)-~(STATUS->C);
+	int v2=GetValue(address);
+	realresult=rawAdd(v1,-v2,0);
+	storeFileReg(d,realresult,address);
+	if(realresult<0x80)
+		STATUS->C=1;
+	else
+		STATUS->C=0;
+	ADD_PC(1);
+}

@@ -624,3 +624,23 @@ void test_goto(void){
 	goto1(code);
 	TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x76);
 }
+void test_subwfb_expect_0x00_C1_Z1(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x1B;
+	memory[WREG]=0x1A;
+	STATUS->C=0;
+	subwfb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+	TEST_ASSERT_EQUAL(STATUS->Z,1);
+}
+void test_subwfb_expect_0xF5_C1_Z1(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x03;
+	memory[WREG]=0x0E;
+	STATUS->C=1;
+	subwfb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+	TEST_ASSERT_EQUAL(STATUS->Z,1);
+}

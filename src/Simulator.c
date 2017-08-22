@@ -221,10 +221,10 @@ Simulator OpcodeTable[256]={
   [0xFC]={nop},
   [0xFD]={nop},
   [0xFE]={nop},
-  [0xFF]={nop},/*
-  [0xEC]={call},
-  [0xED]={call},
-  [0xEF]={goto1},
+  [0xFF]={nop},
+  //[0xEC]={call},
+  //[0xED]={call},
+  [0xEF]={goto1},/*
   [0xEE]={lfsr},
   [0xD8]={rcall},
   [0xD9]={rcall},
@@ -288,20 +288,20 @@ void zero(uint8_t *code){
 }
 
 void printErrorMessage(uint16_t opcode){
-	printf("0x%4x this opcode doesnt match with any fuction!!! Will stop executing\n",opcode);
+	printf("ERROR !!! 0x%4x this opcode not valid!!! Will not continue execute\n",opcode);
 }
 void simulateInstruction(int numberOfInstruction){
-	int temp=(numberOfInstruction*2)-2;
-	//uint8_t opcode=flash[temp];
-	if(OpcodeTable[flash[temp]].execute==0){
-		//add(1,3);
-		//throwException(temp,"\n Program stopped. Invalid opcode detected: 0x%2x",temp);
-		printErrorMessage((flash[temp]<<8)|flash[temp+1]);
-		//printf("0x%4x this opcode doesnt match with any fuction!!! Will stop executing\n",(flash[temp]<<8)|flash[temp+1]);
-		//break;
-	}
-	else
-	OpcodeTable[flash[temp]].execute(&flash[temp]);
+	int temp=GET_PC();
+	int i=0;
+	while(i<numberOfInstruction){
+		if(OpcodeTable[flash[temp]].execute==0){
+			printErrorMessage((flash[temp]<<8)|flash[temp+1]);
+			i=2*MB;
+		}
+		else
+			OpcodeTable[flash[temp]].execute(&flash[temp]);
+		i++;
+		}
 }
 void simulateAll(){
   int i=0;
