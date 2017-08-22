@@ -1,11 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <malloc.h>
 #include <stdarg.h>
 #include "Exception.h"
 #include "CException.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "error.h"
+#include "token.h"
 
-void throwException(int errorCode, void *data, char *message, ...) {
+void add(int a ,int b){
+  a+b;
+}
+void throwException(int errorCode, char *message, ...) {
   va_list args;
   char *buffer;
   int length;
@@ -20,7 +26,7 @@ void throwException(int errorCode, void *data, char *message, ...) {
 
   e->msg = buffer;
   e->errorCode = errorCode;
-  e->data = data;
+  //e->data = data;
 
   Throw(e);
 }
@@ -34,5 +40,5 @@ void freeException(Exception *e) {
 }
 
 void dumpException(Exception *e) {
-  printf("%s (err=%d)\n", e->msg, e->errorCode);
+  printf("%s \n", e->msg);
 }

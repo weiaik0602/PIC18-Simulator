@@ -1,6 +1,8 @@
 #ifndef _SIMULATOR_H
 #define _SIMULATOR_H
 #include <stdint.h>
+#include "token.h"
+#include "error.h"
 
 
 typedef struct Simulator Simulator;
@@ -10,4 +12,5 @@ struct Simulator{
 };
 void simulateInstruction(int numberOfInstruction);
 void simulateAll();
+void printErrorMessage(uint16_t opcode);
 #endif // _SIMULATOR_H

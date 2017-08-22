@@ -283,21 +283,36 @@ void zero(uint8_t *code){
 							break;
 		case(0x0F):tblwtprei();
 							break;
-			default:nop(code);
+			default:break;
 	};
+}
+
+void printErrorMessage(uint16_t opcode){
+	printf("0x%4x this opcode doesnt match with any fuction!!! Will stop executing\n",opcode);
 }
 void simulateInstruction(int numberOfInstruction){
 	int temp=(numberOfInstruction*2)-2;
-//	if(OpcodeTable[flash[temp]].execute(&flash[temp])==0){
-	//	throwException(temp,"\n Program stopped. Invalid opcode detected: 0x%2x",temp);
-	//}
+	//uint8_t opcode=flash[temp];
+	if(OpcodeTable[flash[temp]].execute==0){
+		//add(1,3);
+		//throwException(temp,"\n Program stopped. Invalid opcode detected: 0x%2x",temp);
+		printErrorMessage((flash[temp]<<8)|flash[temp+1]);
+		//printf("0x%4x this opcode doesnt match with any fuction!!! Will stop executing\n",(flash[temp]<<8)|flash[temp+1]);
+		//break;
+	}
+	else
 	OpcodeTable[flash[temp]].execute(&flash[temp]);
-
 }
 void simulateAll(){
   int i=0;
-   while(i<2*MB){
+  while(i<2*MB){
+		if(OpcodeTable[flash[i]].execute==0){
+			 printErrorMessage((flash[i]<<8)|flash[i+1]);
+			 i=2*MB;
+		 }
+		else{
      OpcodeTable[flash[i]].execute(&flash[i]);
      i=GET_PC();
+	 	}
    }
 }

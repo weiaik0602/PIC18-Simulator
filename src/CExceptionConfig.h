@@ -3,7 +3,7 @@
 
 #include "Exception.h"
 
-#define CEXCEPTION_T        ExceptionPtr
-#define CEXCEPTION_NONE     ((ExceptionPtr)0x5A5A5A5A)
+#define CEXCEPTION_T      ExceptionPtr
+#define CEXCEPTION_NONE   ((ExceptionPtr)0x5A5A5A5A)
 
 #endif // CExceptionConfig_H
