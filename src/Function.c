@@ -96,6 +96,10 @@ void subwf(uint8_t *code){
 	int v2=GetValue(WREG);
 	realresult=rawAdd(v1,-v2,0);
 	storeFileReg(d,realresult,address);
+	if(realresult<0x80)
+		STATUS->C=1;
+	else
+		STATUS->C=0;
 	ADD_PC(1);
 }
 void bcf(uint8_t *code){
