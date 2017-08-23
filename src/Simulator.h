@@ -13,4 +13,5 @@ struct Simulator{
 void simulateInstruction(int numberOfInstruction);
 void simulateAll();
 void printErrorMessage(uint16_t opcode);
+void simulateInstruction1(int numberOfInstruction);
 #endif // _SIMULATOR_H

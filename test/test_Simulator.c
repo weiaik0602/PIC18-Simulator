@@ -59,3 +59,13 @@ void test_simulate(void){
 	//simulateInstruction(1);
 	simulateInstruction(2);
 }
+void test_simulate1(void){
+	uint8_t code[]={0xDE,0x11,
+									0xD9,0x44,};
+	CLEAR_PC();
+	ClrStatus();
+	int size=sizeof(code);
+	memcpy(flash,code,size);
+	//simulateInstruction(1);
+	simulateInstruction1(2);
+}

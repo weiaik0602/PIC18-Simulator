@@ -1,11 +1,10 @@
 #include "Simulator.h"
 #include "GlobalVariable.h"
 #include "Function.h"
-//#include "Exception.h"
-//#include "CExceptionConfig.h"
+#include "Exception.h"
+#include "CException.h"
 #include <stdio.h>
 #include <stdint.h>
-
 
 Simulator OpcodeTable[256]={
 	[0x00]={zero},
@@ -315,4 +314,17 @@ void simulateAll(){
      i=GET_PC();
 	 	}
    }
+}
+void simulateInstruction1(int numberOfInstruction){
+	int temp=GET_PC();
+	int i=0;
+	while(i<numberOfInstruction){
+		if(OpcodeTable[flash[temp]].execute==0){
+			throwException(temp,"\nsafag");
+			i=2*MB;
+		}
+		else
+			OpcodeTable[flash[temp]].execute(&flash[temp]);
+		i++;
+		}
 }
