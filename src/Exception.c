@@ -44,11 +44,13 @@ void freeException(Exception *e) {
 }
 void freeException1(Exception *e){
   free(e);
+  //e->msg=NULL;
+  //e->errorCode=NULL;
 }
 
 
 void dumpException(Exception *e){
   printf ("%s (opcode = 0x%02x)\n", e->msg, e->errorCode);
   printf("%s\n","This program will be stopped!!!" );
-  printf("-----------------------------------------------------------------");
+  printf("-----------------------------------------------------------------\n");
 }

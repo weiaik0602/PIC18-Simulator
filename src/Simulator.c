@@ -289,30 +289,32 @@ void zero(uint8_t *code){
 }
 
 void simulateAll(){
-  int i=0;
-  while(i<2*MB){
-		if(OpcodeTable[flash[i]].execute==0){
+	int i=0;
+	while(i<2*MB){
+		int PC=GET_PC();
+		if(OpcodeTable[flash[PC]].execute==0){
 			Throw(createException("ERROR, This opcode is not valid  " \
-														,(flash[i]<<8)|flash[i+1]));
+														,(flash[PC]<<8)|flash[PC+1]));
 			i=2*MB;
 		}
 		else{
-     OpcodeTable[flash[i]].execute(&flash[i]);
-     i=GET_PC();
-	 	}
-   }
+			OpcodeTable[flash[PC]].execute(&flash[PC]);
+			i++;
+		}
+		}
 }
 void simulateInstruction(int numberOfInstruction){
-	//int temp=GET_PC();
 	int i=0;
 	while(i<numberOfInstruction){
-		if(OpcodeTable[flash[i]].execute==0){
+		int PC=GET_PC();
+		if(OpcodeTable[flash[PC]].execute==0){
 			Throw(createException("ERROR, This opcode is not valid  " \
-														,(flash[i]<<8)|flash[i+1]));
+														,(flash[PC]<<8)|flash[PC+1]));
 			i=2*MB;
 		}
-		else
-			OpcodeTable[flash[i]].execute(&flash[i]);
-		i=GET_PC();
+		else{
+			OpcodeTable[flash[PC]].execute(&flash[PC]);
+			i++;
+		}
 		}
 }

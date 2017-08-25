@@ -7,7 +7,7 @@ typedef struct Exception Exception;
 typedef Exception* ExceptionPtr;
 struct Exception {
   char *msg;
-  int  errorCode;
+  uint16_t  errorCode;
   void *data;
 };
 

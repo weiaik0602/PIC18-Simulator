@@ -63,7 +63,7 @@ void movlb(uint8_t *code){
 	ADD_PC(1);
 }
 void movlw(uint8_t *code){
-	storeFileReg(1,*(code+1),WREG);
+	storeFileReg(0,*(code+1),WREG);
 	ADD_PC(1);
 }
 void movwf(uint8_t *code){
