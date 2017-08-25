@@ -5,7 +5,6 @@
 #include "Function.h"
 #include "Exception.h"
 #include "CException.h"
-//#include "CExceptionConfig.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -26,17 +25,20 @@ void test_Simulate_expect_all_instruction_can_run(void){
 									0xC0,0xFF,   //movff 0xFF,0x12;
 									0xF0,0x12,};
 									//0x0E,0xFF};
-	//CEXCEPTION_T ex;
+	CEXCEPTION_T ex;
 	CLEAR_PC();
 	ClrStatus();
 	memory[0xFF]=0x14;
 	memory[0x12]=0x15;
 	int size=sizeof(code);
 	memcpy(flash,code,size);
-	//Try{
+	Try{
 	simulateAll();
-	//}
-	//Catch(ex);
+	}Catch(ex){
+		dumpException(ex);
+		TEST_ASSERT_EQUAL_HEX16(ex->errorCode,0xDB11);
+	}
+	//freeException1(ex);
 	//1st instruction line movlw 0x12
 	TEST_ASSERT_EQUAL_HEX16(memory[WREG],0x11);
 	//2nd instruction line movwf 0x56
@@ -46,22 +48,18 @@ void test_Simulate_expect_all_instruction_can_run(void){
 	//4th intruction line movff 0xFF,0x12(should be skipped)
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x15);
 }*/
-void test_tesing(void){
-	uint8_t code[]={0xDB,0x11,};
+void test_testing_exception(void){
+	uint8_t code[]={0xDB,0x11,
+									0xDA,0x11,};
 
 	CEXCEPTION_T ex;
 	int size=sizeof(code);
 	memcpy(flash,code,size);
-	//char* message=ex->msg;
 	Try{
-		//printf("%s \n", MESSAGE);
-		simulateInstruction1(1);
-		//printf("%s \n", MESSAGE);
+		simulateInstruction(2);
 	}Catch(ex){
-		printf("%s \n", MESSAGE);
 		dumpException(ex);
-		//printf("%s \n", MESSAGE);
-		//TEST_ASSERT_EQUAL_STRING(MESSAGE,"safag");
-
+		TEST_ASSERT_EQUAL_HEX16(ex->errorCode,0xDB11);
 	}
+	freeException1(ex);
 }

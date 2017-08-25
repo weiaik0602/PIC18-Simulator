@@ -5,6 +5,8 @@
 #include "CException.h"
 #include <stdio.h>
 #include <stdint.h>
+#define error 1
+
 
 Simulator OpcodeTable[256]={
 	[0x00]={zero},
@@ -286,45 +288,31 @@ void zero(uint8_t *code){
 	};
 }
 
-void printErrorMessage(uint16_t opcode){
-	printf("ERROR !!! 0x%4x this opcode not valid!!! Will not continue execute\n",opcode);
-}
-void simulateInstruction(int numberOfInstruction){
-	int temp=GET_PC();
-	int i=0;
-	while(i<numberOfInstruction){
-		if(OpcodeTable[flash[temp]].execute==0){
-			printErrorMessage((flash[temp]<<8)|flash[temp+1]);
-			i=2*MB;
-		}
-		else
-			OpcodeTable[flash[temp]].execute(&flash[temp]);
-		i++;
-		}
-}
 void simulateAll(){
   int i=0;
   while(i<2*MB){
 		if(OpcodeTable[flash[i]].execute==0){
-			 printErrorMessage((flash[i]<<8)|flash[i+1]);
-			 i=2*MB;
-		 }
+			Throw(createException("ERROR, This opcode is not valid  " \
+														,(flash[i]<<8)|flash[i+1]));
+			i=2*MB;
+		}
 		else{
      OpcodeTable[flash[i]].execute(&flash[i]);
      i=GET_PC();
 	 	}
    }
 }
-void simulateInstruction1(int numberOfInstruction){
-	int temp=GET_PC();
+void simulateInstruction(int numberOfInstruction){
+	//int temp=GET_PC();
 	int i=0;
 	while(i<numberOfInstruction){
-		if(OpcodeTable[flash[temp]].execute==0){
-			throwException(temp,"safag");
+		if(OpcodeTable[flash[i]].execute==0){
+			Throw(createException("ERROR, This opcode is not valid  " \
+														,(flash[i]<<8)|flash[i+1]));
 			i=2*MB;
 		}
 		else
-			OpcodeTable[flash[temp]].execute(&flash[temp]);
-		i++;
+			OpcodeTable[flash[i]].execute(&flash[i]);
+		i=GET_PC();
 		}
 }
