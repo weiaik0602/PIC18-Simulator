@@ -11,13 +11,11 @@ typedef Exception* ExceptionPtr;
 struct Exception {
   char *msg;
   int  errorCode;
-  void *data;
 };
 Exception *createException(char *msg, int errorCode);
 void freeException(Exception *e);
 void dumpException(Exception *e);
 
-void throwException(int errorCode, char *message, ...);
-void add(int a, int b);
+void throwException(int errorCode, char *message);
 
 #endif // Exception_H

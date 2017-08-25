@@ -128,11 +128,37 @@ void test_addwf_expect_0x10_C_0_DC_1(void){
 }
 void test_subwf_0x11minus0x22_expect_0xEF_N_1(void){
 	uint8_t code[]={0x5E,0x12};    //subwf 0x12,f
-	storeFileReg(1,0x22,WREG);
+	memory[WREG]=0x22;
 	//*WREG=0x22;
 	memory[0x12]=0x11;
 	subwf(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xEF);
+	TEST_ASSERT_EQUAL(STATUS->N,1);
+}
+void test_subwf_expect_0x01_C_1(void){
+	uint8_t code[]={0x5E,0x12};    //subwf 0x12,f
+	memory[0x12]=0x3;
+	memory[WREG]=0x2;
+	subwf(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x1);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+}
+void test_subwf_expect_0x00_C_1(void){
+	uint8_t code[]={0x5E,0x12};    //subwf 0x12,f
+	memory[0x12]=0x2;
+	memory[WREG]=0x2;
+	subwf(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x0);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+	TEST_ASSERT_EQUAL(STATUS->Z,1);
+}
+void test_subwf_expect_0xFF_C_0_N_1(void){
+	uint8_t code[]={0x5E,0x12};    //subwf 0x12,f
+	memory[0x12]=0x2;
+	memory[WREG]=0x3;
+	subwf(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xFF);
+	TEST_ASSERT_EQUAL(STATUS->C,0);
 	TEST_ASSERT_EQUAL(STATUS->N,1);
 }
 void test_bcf_expect_0xBF(void){
@@ -640,7 +666,52 @@ void test_subwfb_expect_0xF5_C1_Z1(void){
 	memory[WREG]=0x0E;
 	STATUS->C=1;
 	subwfb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xF5);
+	TEST_ASSERT_EQUAL(STATUS->C,0);
+	TEST_ASSERT_EQUAL(STATUS->Z,0);
+	TEST_ASSERT_EQUAL(STATUS->N,1);
+}
+void test_subwfb_expect_0x0C_C1_Z0_N0(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x19;
+	memory[WREG]=0x0D;
+	STATUS->C=1;
+	subwfb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x0C);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+	TEST_ASSERT_EQUAL(STATUS->Z,0);
+	TEST_ASSERT_EQUAL(STATUS->N,0);
+}
+void test_subfwb_expect_0x0C_C1_Z0_N0(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x03;
+	memory[WREG]=0x02;
+	STATUS->C=1;
+	subfwb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0xFF);
+	TEST_ASSERT_EQUAL(STATUS->C,0);
+	TEST_ASSERT_EQUAL(STATUS->Z,0);
+	TEST_ASSERT_EQUAL(STATUS->N,1);
+}
+void test_subfwb_expect_0x03_C1_Z0_N0(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x02;
+	memory[WREG]=0x05;
+	STATUS->C=1;
+	subfwb(code);
+	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x03);
+	TEST_ASSERT_EQUAL(STATUS->C,1);
+	TEST_ASSERT_EQUAL(STATUS->Z,0);
+	TEST_ASSERT_EQUAL(STATUS->N,0);
+}
+void test_subfwb_expect_0x00_C1_Z1_N0(void){
+	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
+	memory[0x12]=0x01;
+	memory[WREG]=0x02;
+	STATUS->C=0;
+	subfwb(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x00);
 	TEST_ASSERT_EQUAL(STATUS->C,1);
 	TEST_ASSERT_EQUAL(STATUS->Z,1);
+	TEST_ASSERT_EQUAL(STATUS->N,0);
 }

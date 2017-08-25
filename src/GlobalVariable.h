@@ -7,6 +7,8 @@ extern uint8_t memory[];
 extern uint8_t flash[];
 extern uint8_t tableBuffer[];
 extern int enableFlashWrite;
+extern char *MESSAGE;
+extern int ERRORCODE;
 
 
 

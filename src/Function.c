@@ -531,10 +531,12 @@ void subwfb(uint8_t *code){
 	address=GetAbsoluteAddress(a,address);
 	uint8_t realresult;
 	int v1=GetValue(address);
-	int C=STATUS->C;
-	int v2=(GetValue(WREG))-~(C);
+	int C=(~(STATUS->C))&0x01;
+	//storeFileReg(d,C,address);
+	int v2=(GetValue(WREG))+C;
 	realresult=rawAdd(v1,-v2,0);
 	storeFileReg(d,realresult,address);
+
 	if(realresult<0x80)
 		STATUS->C=1;
 	else
@@ -547,8 +549,9 @@ void subfwb(uint8_t *code){
 	unsigned int address=*(code+1);
 	address=GetAbsoluteAddress(a,address);
 	uint8_t realresult;
-	int v1=GetValue(WREG)-~(STATUS->C);
-	int v2=GetValue(address);
+	int C=(~(STATUS->C))&0x01;
+	int v1=GetValue(WREG);
+	int v2=GetValue(address)+C;
 	realresult=rawAdd(v1,-v2,0);
 	storeFileReg(d,realresult,address);
 	if(realresult<0x80)

@@ -320,7 +320,7 @@ void simulateInstruction1(int numberOfInstruction){
 	int i=0;
 	while(i<numberOfInstruction){
 		if(OpcodeTable[flash[temp]].execute==0){
-			throwException(temp,"\nsafag");
+			throwException(temp,"safag");
 			i=2*MB;
 		}
 		else

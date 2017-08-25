@@ -3,7 +3,8 @@
 #include "GlobalVariable.h"
 #include "RawFunction.h"
 #include "Function.h"
-//#include "Exception.h"
+#include "Exception.h"
+#include "CException.h"
 //#include "CExceptionConfig.h"
 #include <stdio.h>
 #include <stdint.h>
@@ -17,15 +18,13 @@ void tearDown(void){}
 
 
 ///////////////////////////////////////////////////////////
-
+/*
 void test_Simulate_expect_all_instruction_can_run(void){
-	uint8_t code[]={0x0E,0x11,     //movlw 0x11
+	uint8_t code[]={0x0e,0x11,     //movlw 0x11
 									0x6E,0x56,   //movwf 0x56
-									0xA8,0x56,   //btfss 0x56
+									0xa8,0x56,   //btfss 0x56
 									0xC0,0xFF,   //movff 0xFF,0x12;
-									0xF0,0x12,
-									0xDE,0x11,
-									0x0E,0x45,};
+									0xF0,0x12,};
 									//0x0E,0xFF};
 	//CEXCEPTION_T ex;
 	CLEAR_PC();
@@ -34,7 +33,6 @@ void test_Simulate_expect_all_instruction_can_run(void){
 	memory[0x12]=0x15;
 	int size=sizeof(code);
 	memcpy(flash,code,size);
-	//simulateInstruction(1);
 	//Try{
 	simulateAll();
 	//}
@@ -47,25 +45,23 @@ void test_Simulate_expect_all_instruction_can_run(void){
 	//(1000 1000)<-testing if the 4th bit is clear
 	//4th intruction line movff 0xFF,0x12(should be skipped)
 	TEST_ASSERT_EQUAL_HEX16(memory[0x12],0x15);
-	TEST_ASSERT_EQUAL_HEX16(memory[WREG],0x11);
-}
-void test_simulate(void){
-	uint8_t code[]={0xDE,0x11,
-									0xD9,0x44,};
-	CLEAR_PC();
-	ClrStatus();
+}*/
+void test_tesing(void){
+	uint8_t code[]={0xDB,0x11,};
+
+	CEXCEPTION_T ex;
 	int size=sizeof(code);
 	memcpy(flash,code,size);
-	//simulateInstruction(1);
-	simulateInstruction(2);
-}
-void test_simulate1(void){
-	uint8_t code[]={0xDE,0x11,
-									0xD9,0x44,};
-	CLEAR_PC();
-	ClrStatus();
-	int size=sizeof(code);
-	memcpy(flash,code,size);
-	//simulateInstruction(1);
-	simulateInstruction1(2);
+	//char* message=ex->msg;
+	Try{
+		//printf("%s \n", MESSAGE);
+		simulateInstruction1(1);
+		//printf("%s \n", MESSAGE);
+	}Catch(ex){
+		printf("%s \n", MESSAGE);
+		dumpException(ex);
+		//printf("%s \n", MESSAGE);
+		//TEST_ASSERT_EQUAL_STRING(MESSAGE,"safag");
+
+	}
 }
