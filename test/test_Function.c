@@ -493,7 +493,7 @@ void test_infsnz_expect_PC_0x02(void){
   infsnz(code);
   TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
 }
-void test_movf_expect_0x99_in_0x12(void){
+void test_movf_expect_0x99_N1_Z0(void){
     uint8_t code[]={0x02,0x12};
     memory[0x12]=0x99;
     movf(code);
@@ -514,7 +514,7 @@ void test_negf_expect_0xC6(void){
   negf(code);
   TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xC6);
 }
-void test_rlcf_expect_0xCC(void){
+void test_rlcf_expect_0xCC_C1(void){
   uint8_t code[]={0x02,0x33};
   memory[0x33]=0xE6;
   ClrStatus();
@@ -522,7 +522,7 @@ void test_rlcf_expect_0xCC(void){
   TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xCC);
   TEST_ASSERT_EQUAL_HEX16(STATUS->C,1);
 }
-void test_rlncf_expect_0xCC(void){
+void test_rlncf_expect_0xCD_C0(void){
   uint8_t code[]={0x02,0x33};
   memory[0x33]=0xE6;
   ClrStatus();
@@ -530,7 +530,7 @@ void test_rlncf_expect_0xCC(void){
   TEST_ASSERT_EQUAL_HEX16(memory[0x33],0xCD);
   TEST_ASSERT_EQUAL_HEX16(STATUS->C,0);
 }
-void test_rrcf_expect_0xCC(void){
+void test_rrcf_expect_0x6B_C1(void){
   uint8_t code[]={0x02,0x33};
   memory[0x33]=0xD7;
   ClrStatus();
@@ -538,7 +538,7 @@ void test_rrcf_expect_0xCC(void){
   TEST_ASSERT_EQUAL_HEX16(memory[0x33],0x6B);
   TEST_ASSERT_EQUAL_HEX16(STATUS->C,1);
 }
-void test_rrncf_expect_0xCC(void){
+void test_rrncf_expect_0xEB_C0(void){
   uint8_t code[]={0x02,0x33};
   memory[0x33]=0xD7;
   ClrStatus();
@@ -572,7 +572,7 @@ void test_tstfsz_expect_PC_0x02(void){
   tstfsz(code);
   TEST_ASSERT_EQUAL_HEX16(GET_PC(),0x02);
 }
-void test_xorwf_expect_PC_0x02(void){
+void test_xorwf_expect_0x1A(void){
   uint8_t code[]={0x02,0x01};
   memory[0x01]=0xAF;
 	memory[WREG]=0xB5;
@@ -592,23 +592,23 @@ void test_andlw_expect_0x03(void){
 		andlw(code);
 		TEST_ASSERT_EQUAL_HEX16(memory[WREG],0x03);
 }
-void test_mullw_expect_0x25(void){
+void test_mullw_expect_0xAD08(void){
 	  uint8_t code[]={0x02,0xC4};
 		memory[WREG]=0xE2;
 		mullw(code);
 		TEST_ASSERT_EQUAL_HEX16(memory[PRODH],0xAD);
 		TEST_ASSERT_EQUAL_HEX16(memory[PRODL],0x08);
 }
-void test_sublw_expect_0x1(void){
+void test_sublw_expect_0x01_C1_Z0_N0(void){
 	uint8_t code[]={0x02,0x02};
 	memory[WREG]=0x01;
 	sublw(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[WREG],0x1);
-	TEST_ASSERT_EQUAL_HEX16(STATUS->C,0x1);
+	TEST_ASSERT_EQUAL_HEX16(STATUS->C,1);
 	TEST_ASSERT_EQUAL_HEX16(STATUS->Z,0);
 	TEST_ASSERT_EQUAL_HEX16(STATUS->N,0);
 }
-void test_sublw_expect_0x0(void){
+void test_sublw_expect_0x00_C1_Z1_N0(void){
 	uint8_t code[]={0x02,0x02};
 	memory[WREG]=0x02;
 	sublw(code);
@@ -626,25 +626,25 @@ void test_sublw_expect_0xFF(void){
 	TEST_ASSERT_EQUAL_HEX16(STATUS->Z,0);
 	TEST_ASSERT_EQUAL_HEX16(STATUS->N,1);
 }
-void test_xorlw_expect_0x03(void){
+void test_xorlw_expect_0x1A(void){
 	  uint8_t code[]={0x02,0xAF};
 		memory[WREG]=0xB5;
 		xorlw(code);
 		TEST_ASSERT_EQUAL_HEX16(memory[WREG],0x1A);
 }
-void test_btg_expect(void){
+void test_btg_expect_0x65(void){
 	uint8_t code[]={0x08,0x02};
 	memory[0x02]=0x75;
 	btg(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[0x02],0x65);
 }
-void test_iorlw_expect(void){
+void test_iorlw_expect_WREG_0xBF(void){
 	uint8_t code[]={0x02,0x35};
 	memory[WREG]=0x9A;
 	iorlw(code);
 	TEST_ASSERT_EQUAL_HEX16(memory[WREG],0xBF);
 }
-void test_goto(void){
+void test_goto_expect_PC_0x76(void){
 	uint8_t code[]={0xEF,0x76,
 									0xF0,0x00,};
 	goto1(code);
@@ -660,7 +660,7 @@ void test_subwfb_expect_0x00_C1_Z1(void){
 	TEST_ASSERT_EQUAL(STATUS->C,1);
 	TEST_ASSERT_EQUAL(STATUS->Z,1);
 }
-void test_subwfb_expect_0xF5_C1_Z1(void){
+void test_subwfb_expect_0xF5_C0_Z0_N1(void){
 	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
 	memory[0x12]=0x03;
 	memory[WREG]=0x0E;
@@ -682,7 +682,7 @@ void test_subwfb_expect_0x0C_C1_Z0_N0(void){
 	TEST_ASSERT_EQUAL(STATUS->Z,0);
 	TEST_ASSERT_EQUAL(STATUS->N,0);
 }
-void test_subfwb_expect_0x0C_C1_Z0_N0(void){
+void test_subfwb_expect_0xFF_C0_Z0_N1(void){
 	uint8_t code[]={0x02,0x12};    //subwfb 0x12,f
 	memory[0x12]=0x03;
 	memory[WREG]=0x02;

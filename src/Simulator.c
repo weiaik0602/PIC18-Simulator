@@ -290,7 +290,7 @@ void zero(uint8_t *code){
 
 void simulateAll(){
 	int i=0;
-	while(i<2*MB){
+	while(i<1048576){
 		int PC=GET_PC();
 		if(OpcodeTable[flash[PC]].execute==0){
 			Throw(createException("ERROR, This opcode is not valid  " \
