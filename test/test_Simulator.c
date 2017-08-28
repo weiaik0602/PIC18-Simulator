@@ -30,7 +30,7 @@ void test_testing_exception(void){
 		dumpException(ex);
 		TEST_ASSERT_EQUAL_HEX16(ex->errorCode,0xDB11);
 	}
-	freeException1(ex);
+	freeException(ex);
 
 }
 void test_Simulate_expect_all_instruction_can_run(void){

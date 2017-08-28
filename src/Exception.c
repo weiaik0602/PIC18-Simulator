@@ -35,17 +35,8 @@ void throwException(int errorCode, void *data, char *message, ...) {
   Throw(e);
 }
 
-void freeException(Exception *e) {
-  if(e) {
-    if(e->msg)
-      free(e->msg);
-    free(e);
-  }
-}
-void freeException1(Exception *e){
+void freeException(Exception *e){
   free(e);
-  //e->msg=NULL;
-  //e->errorCode=NULL;
 }
 
 
